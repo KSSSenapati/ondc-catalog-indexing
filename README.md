@@ -1,10 +1,10 @@
 # ONDC Catalog Indexing - Team Cyborg
 
-###Requirements:
+### Requirements:
 1. docker
 2. python3
 
-###Installation:
+### Installation:
 1. Install python virtual environment:
    ```bash
    python3 -m venv env
@@ -27,7 +27,7 @@
    ```
 Note: The ```./docker-compose.yml``` file contains zookeeper, kafka, storm-ui, storm-nimbus, storm-supervisor and solr services
 
-###Steps to run Kafka Producer Consumer example:
+### Steps to run Kafka Producer Consumer example:
 1. Run the producer script:
    ```bash
    python3 ./kafka/producer.py
@@ -37,7 +37,7 @@ Note: The ```./docker-compose.yml``` file contains zookeeper, kafka, storm-ui, s
    python3 ./kafka/consumer.py
    ```
 
-###Steps to run Flask API example:
+### Steps to run Flask API example:
 1. Run the consumer script:
    ```bash
    python3 ./kafka/consumer.py
