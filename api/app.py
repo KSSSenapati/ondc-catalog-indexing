@@ -13,7 +13,7 @@ import time
 app = FastAPI()
 producer = KafkaProducer(bootstrap_servers='localhost:9092')
 solr = pysolr.Solr('http://localhost:8983/solr/ondc', timeout=10)
-client = pymongo.MongoClient("mongodb://localhost:27017/")
+client = pymongo.MongoClient(host="localhost", port=27017, username="admin", password="admin")
 db = client["lookup"]
 
 app.add_middleware(
@@ -31,25 +31,35 @@ async def addProduct(request: Request):
         body = await request.json()
         message = {
             "productTitle": body.get("productTitle"),
+            "masterCategory": body.get("masterCategory"),
+            "subCategory": body.get("subCategory"),
+            "article": body.get("article"),
+            "attribute": body.get("getAttributes"),
+            "price": body.get("price"),
+            "pinCode": body.get("pinCode"),
+            "discount": body.get("discount"),
+            "sizeCount": body.get("sizeCount"),
+            "rating": body.get("rating"),
+            "acceleratorTag": body.get("acceleratorTag"),
+            "image": body.get("image"),
+            "ad": body.get("ad"),
         }
-        print(body)
 
-        for key, val in message.items():
-            if val is None:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
+        if body.get("productTitle") is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="productId is required")
+
+        keys_to_remove = [key for key, val in message.items() if val is None]
+        for key in keys_to_remove:
+            message.pop(key)
 
         collection = db["product"]
-        document = {"productTitle": productTitle}
+        document = {"productTitle": message["productTitle"]}
         result = collection.insert_one(document)
-        message["productId"] = result.inserted_id
+        message["productId"] = str(result.inserted_id)
 
         producer.send('addProduct', value=json.dumps(message).encode('utf-8'))
         producer.flush()
-
-        time.sleep(1)
-
-        updateAttributes(request)
         return {'status': 'success', 'message': 'New product added successfully'}
     except Exception as e:
         raise HTTPException(
@@ -236,7 +246,7 @@ async def updateImage(request: Request):
             "productId": message["productId"], "imagePath": message["image"]}
         result = collection.insert_one(document)
 
-        message["imageId"] = result.inserted_id
+        message["imageId"] = str(result.inserted_id)
         message.pop('image')
 
         producer.send('updateImage', value=json.dumps(message).encode('utf-8'))
