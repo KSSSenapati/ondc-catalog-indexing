@@ -1,0 +1,98 @@
+{
+  "apparel": {
+    "topwear": {
+      "tshirts": [
+        "fabric",
+        "pattern",
+        "neck",
+        "fabric 2"
+      ],
+      "shirts":[
+        "fabric",
+        "pattern",
+        "neck",
+        "fabric 2",
+        "wash"
+      ]
+    },
+    "bottomwear": {
+      "trousers": [
+        "fabric",
+        "fit type",
+        "print or pattern"
+      ],
+      "joggers": [
+        "fabric",
+        "fit type",
+        "waist rise"
+      ]
+    }
+  },
+  "grocery": {
+    "fruits": {
+      "apple": [
+        "variety",
+        "region"
+      ],
+      "banana": [
+        "variety",
+        "region"
+      ]
+    },
+    "dairy products": {
+      "milk": [
+        "packaging",
+        "type"
+      ],
+      "curd": [
+        "packaging"
+      ]
+    },
+    "baked goods": {
+      "bread": [
+        "type"
+      ]
+    }
+  },
+  "electronics": {
+    "headphones": {
+      "neckbands": [
+        "warranty",
+        "microphone",
+        "connectivity"
+      ],
+      "earbuds": [
+        "warranty",
+        "connectivity"
+      ],
+      "earphones": [
+        "warranty",
+        "connectivity"
+      ]
+    }
+  },
+  "footwear": {
+    "shoes": {
+      "casual shoes": [
+        "ankle height",
+        "insole",
+        "fastening"
+      ],
+      "sports shoes": [
+        "ankle height",
+        "outsole",
+        "fastening"
+      ],
+      "formal shoes": [
+        "ankle height",
+        "toe shape"
+      ]
+    },
+    "flip flops": {
+      "flip flops": [
+        "material",
+        "type"
+      ]
+    }
+  }
+}
