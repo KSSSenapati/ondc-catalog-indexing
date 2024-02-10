@@ -1,4 +1,4 @@
-version: '3.1'
+version: "3.1"
 
 services:
   zookeeper:
@@ -20,41 +20,41 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: INSIDE
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
 
-  nimbus:
-    image: storm
-    container_name: ondc-storm-nimbus
-    command: storm nimbus
-    depends_on:
-      - zookeeper
-    links:
-      - zookeeper
-    restart: always
-    ports:
-      - 6627:6627
+  # nimbus:
+  #   image: storm
+  #   container_name: ondc-storm-nimbus
+  #   command: storm nimbus
+  #   depends_on:
+  #     - zookeeper
+  #   links:
+  #     - zookeeper
+  #   restart: always
+  #   ports:
+  #     - 6627:6627
 
-  supervisor:
-    image: storm
-    container_name: ondc-storm-supervisor
-    command: storm supervisor
-    depends_on:
-      - nimbus
-      - zookeeper
-    links:
-      - nimbus
-      - zookeeper
-    restart: always
+  # supervisor:
+  #   image: storm
+  #   container_name: ondc-storm-supervisor
+  #   command: storm supervisor
+  #   depends_on:
+  #     - nimbus
+  #     - zookeeper
+  #   links:
+  #     - nimbus
+  #     - zookeeper
+  #   restart: always
 
-  ui:
-    image: storm
-    container_name: ondc-storm-ui
-    command: storm ui
-    depends_on:
-      - nimbus
-    links:
-      - nimbus
-    restart: always
-    ports:
-      - 8080:8080
+  # ui:
+  #   image: storm
+  #   container_name: ondc-storm-ui
+  #   command: storm ui
+  #   depends_on:
+  #     - nimbus
+  #   links:
+  #     - nimbus
+  #   restart: always
+  #   ports:
+  #     - 8080:8080
 
   solr:
     image: solr
