@@ -24,8 +24,9 @@ async def addProduct(request: Request):
             "productTitle": body.get("productTitle"),
         }
 
-        if not productTitle:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{key} is required")
+        for key, val in message.items():
+            if val is None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         collection = db["product"]
         document = {"productTitle": productTitle}
@@ -48,9 +49,10 @@ async def queryProduct(id: str, content: str):
     try:
         if not id:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="productId is required")
-        
-        results = solr.search(f'productId:{productId}')
-        return {'status': 'success', 'message': result}
+
+        query = 'id:"doc_{}"'.format(id)
+        results = solr.search(query)
+        return {'status': 'success', 'message': results}
     except Exception as e:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
@@ -76,8 +78,8 @@ async def updateAttributes(request: Request):
         for api in api_list:
             try:
                 api(request)
-            except:
-                print(f"Exception in {func.__name__}: {e}")
+            except Exception as e:
+                print(f"Exception in {api.__name__}: {e}")
                 pass
 
         message = {
@@ -112,9 +114,12 @@ async def updateDiscount(request: Request):
             "salesDiscount": body.get("salesDiscount"),
         }
 
+        if message["salesDiscount"] is None:
+            message["salesDiscount"] = 0
+        print(message)
         for key, val in message.items():
-            if not val:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{key} is required")
+            if val is None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         producer.send('updateDiscount', value=json.dumps(message).encode('utf-8'))
         producer.flush()
@@ -133,8 +138,8 @@ async def updateSKU(request: Request):
         }
 
         for key, val in message.items():
-            if not val:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{key} is required")
+            if val is None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         producer.send('updateSKU', value=json.dumps(message).encode('utf-8'))
         producer.flush()
@@ -153,8 +158,8 @@ async def updateRating(request: Request):
         }
 
         for key, val in message.items():
-            if not val:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{key} is required")
+            if val is None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         producer.send('updateRating', value=json.dumps(message).encode('utf-8'))
         producer.flush()
@@ -173,8 +178,8 @@ async def updateTag(request: Request):
         }
 
         for key, val in message.items():
-            if not val:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{key} is required")
+            if val is None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         producer.send('updateTag', value=json.dumps(message).encode('utf-8'))
         producer.flush()
@@ -193,8 +198,8 @@ async def updateImage(request: Request):
         }
 
         for key, val in message.items():
-            if not val:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{key} is required")
+            if val is None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         collection = db["image"]
         document = {"productId": message["productId"], "imagePath": message["image"]}
@@ -220,8 +225,8 @@ async def updateAd(request: Request):
         }
 
         for key, val in message.items():
-            if not val:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{key} is required")
+            if val is None:
+                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         producer.send('updateAd', value=json.dumps(message).encode('utf-8'))
         producer.flush()
