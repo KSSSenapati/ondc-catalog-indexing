@@ -62,6 +62,6 @@ services:
     ports:
       - 8983:8983
     environment:
-      - SOLR_HOME=/opt/solr/server/solr/configsets/_default/conf
+      - SOLR_HOME=/opt/solr/server/solr/configsets/
     volumes:
-      - ./solr-config:/opt/solr/server/solr/configsets/_default/conf
+      - ./solr-config:/opt/solr/server/solr/configsets/
