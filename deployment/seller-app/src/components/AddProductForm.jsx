@@ -10,8 +10,15 @@ import { TagsInput } from 'react-tag-input-component';
 import data from '../data.json';
 import ShowModal from './ShowModal';
 
+import '../config.js';
+
+var randomize = require('randomatic');
+
 function AddProductForm() {
+  const [productId, setProductId] = useState("")
   const [productTitle, setProductTitle] = useState("")
+
+  const [productType, setProductType] = useState("")
 
   const masterCategoryList = Object.keys(data);
   const [subCategoryList, setSubCategoryList] = useState([])
@@ -42,31 +49,33 @@ function AddProductForm() {
   }
 
   const getAttributes = () => {
-    const finalList = []
+    const _attribute = {};
     attribute.forEach((item, index) => {
       if (attributeValue[index] !==  undefined) {
-        const _attribute = {};
+        
         _attribute[item] = attributeValue[index];
-        finalList.push(_attribute);
       }
     })
-    return finalList;
+    return _attribute;
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setProductId(randomize('A0', 12));
     const _payload = {
-      "productTitle": productTitle,
-      "masterCategory": masterCategory,
-      "subCategory": subCategory,
-      "article": article,
-      "attribute": getAttributes(),
+      "product_id": productId,
+      "product_title": productTitle,
+      "product_type": productType,
+      "master_category": masterCategory,
+      "sub_category": subCategory,
+      "article_type": article,
+      "attributes": getAttributes(),
       "price": price,
       "discount": discount,
-      "discountedPrice": discountedPrice,
-      "acceleratorTags": acceleratorTag,
-      "pinCode": pinCode,
-      "image" : imageFile
+      "discounted_price": discountedPrice,
+      "accelerator_tag": acceleratorTag,
+      "pincode": pinCode,
+      "main_image" : imageFile
     }
     setSubmitStatus(true);
     const options = {
@@ -79,7 +88,7 @@ function AddProductForm() {
     }
 
     console.log(options.body);
-    fetch("http://127.0.0.1:8000/addProduct", options)
+    fetch(global.config.url+"addProduct", options)
       .then(response => response.json())
       .then(response => console.log(response))
       .catch(err => console.log(err))
@@ -120,15 +129,27 @@ function AddProductForm() {
 
   return (
     <Form onSubmit={(e) => handleSubmit(e)} className="pb-6">
-      {submitStatus && <ShowModal modalBody="Your product id is" onClose={()=> setSubmitStatus(false)} modalShow={submitStatus} />}
+      {submitStatus && <ShowModal modalContent={`Your Product id is ${productId}`} onClose={()=> setSubmitStatus(false)} modalShow={submitStatus} modalTitle="Successful Product Addition" />}
         <Row>
         <h3 className='mb-3'>Add Product Form</h3>
         <Col md = {8}>
             <Row>
+              <Col md={8}>
                 <Form.Group className="mb-3" controlId="formProductTitle">
                     <Form.Label>Product Title</Form.Label>
                     <Form.Control required type="text" placeholder="Enter Title" onChange={e => setProductTitle(e.target.value)}/>
                 </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group className="mb-3" controld="formMasterCategory" >
+                    <Form.Label>Set Product Type</Form.Label>
+                    <Form.Select required onChange={(e) => setProductType(e.target.value)}>
+                      <option></option>
+                      <option>Live</option>
+                      <option>Non-Live</option>
+                    </Form.Select>
+                  </Form.Group>
+              </Col>
             </Row>
 
             {/* Master Category Dropdown Start*/}
@@ -259,7 +280,7 @@ function AddProductForm() {
               <Col>
                 <Form.Group className="mb-3" controlId="formDiscountedPrice">
                     <Form.Label>Discounted Price (INR) </Form.Label>
-                    <Form.Control type="number" disabled={price==="0"} min="0" max={price} value={discountedPrice} placeholder="Enter Discounted Price (INR)" onChange={(e) => {
+                    <Form.Control type="number" disabled={price==="0"} min="0" value={discountedPrice} placeholder="Enter Discounted Price (INR)" onChange={(e) => {
                       setDiscountedPrice(e.target.value);
                       setDiscount((1 - e.target.value/price) * 100);
                       }

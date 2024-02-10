@@ -1,0 +1,33 @@
+export function recursiveDiff(a, b, node){
+    for(var prop in a){
+        if(typeof b[prop] === 'undefined'){
+            addNode(prop, '[[removed]]', node);
+        }
+        else if(JSON.stringify(a[prop]) !== JSON.stringify(b[prop])){
+            // if value
+            if(typeof b[prop] !== 'object' || b[prop] === null){
+                addNode(prop, b[prop], node);
+            }
+            else {
+                // if array
+                if(checkArray(b[prop])){
+                   addNode(prop, [], node);
+                   recursiveDiff(a[prop], b[prop], node[prop]);
+                }
+                // if object
+                else {
+                    addNode(prop, {}, node);
+                    recursiveDiff(a[prop], b[prop], node[prop]);
+                }
+            }
+        }
+    }
+}
+
+function addNode(prop, value, parent){
+        parent[prop] = value;
+}
+
+export function checkArray(obj){
+    return (Object.prototype.toString.call(obj) === '[object Array]');
+}

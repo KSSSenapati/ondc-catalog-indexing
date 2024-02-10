@@ -1,25 +1,26 @@
-import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-import { useState } from 'react';
 
 function MyVerticallyCenteredModal(props) {
   return (
     <Modal
       {...props}
-      size="lg"
+      size="md"
       aria-labelledby="contained-modal-title-vcenter"
       centered
     >
-      <Modal.Body closeButton>
+      <Modal.Header closeButton>
+        <h4>{props.modalTitle}</h4>
+      </Modal.Header>
+      <Modal.Body>
         <p>
-          {props.modalBody}
+          {props.modalContent}
         </p>
       </Modal.Body>
     </Modal>
   );
 }
 
-function ShowModal({modalBody, modalShow, onClose}) {
+function ShowModal({modalContent, modalShow, onClose, modalTitle}) {
 
   return (
     <>
@@ -28,7 +29,8 @@ function ShowModal({modalBody, modalShow, onClose}) {
         onHide={() => {
             onClose()
         }}
-        modalBody={modalBody}
+        modalContent={modalContent}
+        modalTitle={modalTitle}
       />
     </>
   );
