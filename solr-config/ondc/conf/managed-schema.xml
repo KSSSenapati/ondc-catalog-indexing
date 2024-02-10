@@ -481,7 +481,7 @@
   <field name="product_id" type="int" indexed="true" stored="true" required="false" multiValued="false" docValues="true"/>
   <field name="product_title" type="ondc_text_general" indexed="true" stored="true" required="false"/>
   <field name="product_type" type="string" indexed="true" required="false" stored="true" multiValued="false"/>
-  <field name="ad_enabled" type="boolean" default="false" indexed="true" required="true" stored="true" docValues="true"/>
+  <field name="ad_enabled" type="boolean" default="false" indexed="true" required="false" stored="true" docValues="true"/>
   <field name="sizes_facet" type="facetDocValues" multiValued="true"/>
   <dynamicField name="*_size_count" type="int" indexed="true" stored="true" required="false"  multiValued="false" docValues="true" />
   <field name="price" type="float" indexed="true" stored="true" required="false" multiValued="false"/>

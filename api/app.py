@@ -38,7 +38,7 @@ async def addProduct(request: Request):
             "price": body.get("price"),
             "pinCode": body.get("pinCode"),
             "discount": body.get("discount"),
-            "sizeCount": body.get("sizeCount"),
+            "sizesCount": body.get("sizesCount"),
             "rating": body.get("rating"),
             "acceleratorTag": body.get("acceleratorTag"),
             "image": body.get("image"),
