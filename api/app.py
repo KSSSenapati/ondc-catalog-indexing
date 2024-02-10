@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException, status
 from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from kafka import KafkaProducer
 
 import uvicorn
@@ -15,18 +16,28 @@ solr = pysolr.Solr('http://localhost:8983/solr/ondc', timeout=10)
 client = pymongo.MongoClient("mongodb://localhost:27017/")
 db = client["lookup"]
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
 
 @app.post("/addProduct", status_code=status.HTTP_200_OK)
 async def addProduct(request: Request):
     try:
-        body = await request.json() 
+        body = await request.json()
         message = {
             "productTitle": body.get("productTitle"),
         }
+        print(body)
 
         for key, val in message.items():
             if val is None:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         collection = db["product"]
         document = {"productTitle": productTitle}
@@ -41,40 +52,46 @@ async def addProduct(request: Request):
         updateAttributes(request)
         return {'status': 'success', 'message': 'New product added successfully'}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.put("/queryProduct/{id}", status_code=status.HTTP_200_OK)
 async def queryProduct(id: str, content: str):
     try:
         if not id:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="productId is required")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="productId is required")
 
         query = 'id:"doc_{}"'.format(id)
         results = solr.search(query)
         return {'status': 'success', 'message': results}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.delete("/deleteProduct/{id}", status_code=status.HTTP_200_OK)
 async def deleteProduct(id: str):
     try:
         if not id:
-            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="productId is required")
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="productId is required")
 
         producer.send('deleteProduct', key=id.encode())
         producer.flush()
         return {'status': 'success', 'message': 'Product deleted successfully'}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.post("/updateAttributes", status_code=status.HTTP_200_OK)
 async def updateAttributes(request: Request):
     try:
         body = await request.json()
-        api_list = [updateDiscount, updateSKU, updateRating, updateTag, updateImage, updateAd]
+        api_list = [updateDiscount, updateSKU,
+                    updateRating, updateTag, updateImage, updateAd]
         for api in api_list:
             try:
                 api(request)
@@ -97,11 +114,13 @@ async def updateAttributes(request: Request):
         for key in keys_to_remove:
             message.pop(key)
 
-        producer.send('updateAttributes', value=json.dumps(message).encode('utf-8'))
+        producer.send('updateAttributes', value=json.dumps(
+            message).encode('utf-8'))
         producer.flush()
         return {'status': 'success', 'message': 'Attributes updated successfully'}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.post("/updateDiscount", status_code=status.HTTP_200_OK)
@@ -119,13 +138,16 @@ async def updateDiscount(request: Request):
         print(message)
         for key, val in message.items():
             if val is None:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
-        producer.send('updateDiscount', value=json.dumps(message).encode('utf-8'))
+        producer.send('updateDiscount', value=json.dumps(
+            message).encode('utf-8'))
         producer.flush()
         return {'status': 'success', 'message': 'Discount updated successfully'}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.post("/updateSKU", status_code=status.HTTP_200_OK)
@@ -139,13 +161,15 @@ async def updateSKU(request: Request):
 
         for key, val in message.items():
             if val is None:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         producer.send('updateSKU', value=json.dumps(message).encode('utf-8'))
         producer.flush()
         return {'status': 'success', 'message': 'SKU updated successfully'}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.post("/updateRating", status_code=status.HTTP_200_OK)
@@ -159,13 +183,16 @@ async def updateRating(request: Request):
 
         for key, val in message.items():
             if val is None:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
-        producer.send('updateRating', value=json.dumps(message).encode('utf-8'))
+        producer.send('updateRating', value=json.dumps(
+            message).encode('utf-8'))
         producer.flush()
         return {'status': 'success', 'message': 'Data pushed to Kafka successfully.'}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.post("/updateTag", status_code=status.HTTP_200_OK)
@@ -179,13 +206,15 @@ async def updateTag(request: Request):
 
         for key, val in message.items():
             if val is None:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         producer.send('updateTag', value=json.dumps(message).encode('utf-8'))
         producer.flush()
         return {'status': 'success', 'message': 'Tag updated successfully'}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.post("/updateImage", status_code=status.HTTP_200_OK)
@@ -199,12 +228,14 @@ async def updateImage(request: Request):
 
         for key, val in message.items():
             if val is None:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         collection = db["image"]
-        document = {"productId": message["productId"], "imagePath": message["image"]}
+        document = {
+            "productId": message["productId"], "imagePath": message["image"]}
         result = collection.insert_one(document)
-    
+
         message["imageId"] = result.inserted_id
         message.pop('image')
 
@@ -212,7 +243,8 @@ async def updateImage(request: Request):
         producer.flush()
         return {'status': 'success', 'message': 'Image updated successfully'}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 @app.post("/updateAd", status_code=status.HTTP_200_OK)
@@ -226,13 +258,15 @@ async def updateAd(request: Request):
 
         for key, val in message.items():
             if val is None:
-                raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, detail=f"{key} is required")
 
         producer.send('updateAd', value=json.dumps(message).encode('utf-8'))
         producer.flush()
         return {'status': 'success', 'message': 'Tag updated successfully'}
     except Exception as e:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
 
 
 # Exception handling

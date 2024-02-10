@@ -1,2 +1,6 @@
 kafka-python
 Flask
+fastapi
+uvicorn
+pysolr
+pymongo
