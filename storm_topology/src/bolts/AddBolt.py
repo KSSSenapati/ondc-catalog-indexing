@@ -38,4 +38,4 @@ class AddBolt(Bolt):
 
 
 if __name__ == "__main__":
-    UpdateBolt().run()
+    AddBolt().run()
