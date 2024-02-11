@@ -68,7 +68,6 @@ def deleteProduct():
 
 
 def updateProduct(topic):
-    topic = 'updateProduct'
     consumer = KafkaConsumer(topic, bootstrap_servers=['localhost:9092'])
     for message in consumer:
         print(f"Received message in {topic}: {message.value.decode('utf-8')}")

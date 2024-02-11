@@ -4,3 +4,4 @@ venv/
 __pycache__/
 node_modules/
 solr-config/ondc/data
+mongo-data
