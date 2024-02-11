@@ -1,20 +1,26 @@
 from streamparse import Spout
 from kafka import KafkaConsumer
 import logging
+import json
 
 class KafkaSpout(Spout):
-    outputs = ['prod_id', 'discount']
+    outputs = ['message']
 
     def initialize(self, stormconf, context):
-        self.consumer = KafkaConsumer('discount', bootstrap_servers='localhost:9092',
-                                      group_id='my-group', auto_offset_reset='latest')
-        logging.basicConfig(level=logging.ERROR,
-                            format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        self.topic = self.config.get('topic')
+        self.consumer = KafkaConsumer(bootstrap_servers='localhost:9092',
+                                      auto_offset_reset='latest',
+                                      enable_auto_commit=True,
+                                      group_id=None)
+
+        self.consumer.subscribe([self.topic])
 
     def next_tuple(self):
-        for message in self.consumer:
-            prod_id, discount = message.value.split(',')
-            my_tuple = [prod_id.strip(), float(discount.strip())]
-            logging.error("Emitted tuple: %s", my_tuple)
-            self.emit(my_tuple)
+        for msg in self.consumer:
+            self.emit([msg.value.decode('utf-8')])
 
+    def ack(self, tup_id):
+        pass
+
+    def fail(self, tup_id):
+        pass
