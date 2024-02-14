@@ -13,7 +13,8 @@ import time
 app = FastAPI()
 producer = KafkaProducer(bootstrap_servers='localhost:9092')
 solr = pysolr.Solr('http://localhost:8983/solr/ondc', timeout=10)
-client = pymongo.MongoClient(host="localhost", port=27017, username="admin", password="admin")
+client = pymongo.MongoClient(
+    host="localhost", port=27017, username="admin", password="admin")
 db = client["lookup"]
 
 
@@ -45,7 +46,7 @@ kafka_map = {
     'updateAd': {'fields': ['ad_enabled'], 'handler': None},
     'updateImage': {'fields': ['main_image'], 'handler': image_handler},
     'updateProduct': {'fields': ['product_title', 'master_category', 'sub_category',
-        'article_type', 'attribute', 'price', 'pincode', 'attributes'], 'handler': None},
+                                 'article_type', 'attribute', 'price', 'pincode', 'attributes'], 'handler': None},
 }
 
 
@@ -58,7 +59,7 @@ async def addProduct(request: Request):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="product_id is required")
 
-        body['product_id'] = body.get('product_id')
+        # body['product_id'] = body.get('product_id')
         producer.send('addProduct', value=json.dumps(body).encode('utf-8'))
         producer.flush()
         return {'status': 'success', 'message': 'Add successful'}
@@ -79,6 +80,12 @@ async def queryProduct(request: Request):
         results = solr.search(query)
         if len(results.docs):
             docs = results.docs[0]
+            docs["attributes"] = {}
+            for field in list(docs):
+                if field.endswith("_atsa"):
+                    docs["attributes"][field.replace(
+                        '_atsa', '')] = docs[field]
+                    docs.pop(field)
         else:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Document not found")
@@ -95,7 +102,8 @@ async def deleteProduct(id: str):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="product_id is required")
 
-        producer.send('deleteProduct', key=id.encode())
+        producer.send('deleteProduct', value=json.dumps(
+            {"product_id": id}).encode())
         producer.flush()
         return {'status': 'success', 'message': 'Delete successful'}
     except Exception as e:
@@ -112,7 +120,8 @@ async def updateProduct(request: Request):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="product_id is required")
         for topic, opts in kafka_map.items():
-            message = {key: body.get(key) for key in opts['fields'] if key in body}
+            message = {key: body.get(key)
+                       for key in opts['fields'] if key in body}
             if not message:
                 continue
             message['product_id'] = body.get('product_id')

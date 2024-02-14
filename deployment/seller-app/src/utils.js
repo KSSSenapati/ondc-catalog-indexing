@@ -1,16 +1,25 @@
-export function recursiveDiff(a, b, node){
+var diff;
+export function getDiff(a, b){
+    diff = (isArray(a) ? [] : {});
+    recursiveDiff(a, b, diff);
+    return diff;
+}
+
+function recursiveDiff(a, b, node){
+    var checked = [];
+    
     for(var prop in a){
-        if(typeof b[prop] === 'undefined'){
+        if(typeof b[prop] == 'undefined'){
             addNode(prop, '[[removed]]', node);
         }
-        else if(JSON.stringify(a[prop]) !== JSON.stringify(b[prop])){
+        else if(JSON.stringify(a[prop]) != JSON.stringify(b[prop])){
             // if value
-            if(typeof b[prop] !== 'object' || b[prop] === null){
+            if(typeof b[prop] != 'object' || b[prop] == null){
                 addNode(prop, b[prop], node);
             }
             else {
                 // if array
-                if(checkArray(b[prop])){
+                if(isArray(b[prop])){
                    addNode(prop, [], node);
                    recursiveDiff(a[prop], b[prop], node[prop]);
                 }
@@ -28,6 +37,6 @@ function addNode(prop, value, parent){
         parent[prop] = value;
 }
 
-export function checkArray(obj){
+function isArray(obj){
     return (Object.prototype.toString.call(obj) === '[object Array]');
 }

@@ -61,9 +61,10 @@ function AddProductForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    setProductId(randomize('A0', 12));
+    const _id = randomize('0', 8)
+    setProductId(_id);
     const _payload = {
-      "product_id": productId,
+      "product_id": _id,
       "product_title": productTitle,
       "product_type": productType,
       "master_category": masterCategory,
@@ -163,7 +164,7 @@ function AddProductForm() {
                       }
                     }>
                       <option></option>
-                      {masterCategoryList.map((item, index)=> {
+                      {masterCategoryList?.map((item, index)=> {
                         return(
                           <>
                           <option key={index}>{item}</option>
@@ -185,7 +186,7 @@ function AddProductForm() {
                       }
                     }>
                       <option></option>
-                      {subCategoryList.length!== 0 && subCategoryList.map((item, index)=> {
+                      {subCategoryList.length!== 0 && subCategoryList?.map((item, index)=> {
                         return(
                           <>
                           <option key={index}>{item}</option>
@@ -213,7 +214,7 @@ function AddProductForm() {
                     }
                     }>
                       <option></option>
-                      {articleList.length!== 0 && articleList.map((item, index)=> {
+                      {articleList.length!== 0 && articleList?.map((item, index)=> {
                         return(
                           <>
                           <option key={index}>{item}</option>
@@ -237,7 +238,7 @@ function AddProductForm() {
                     </tr>
                   </thead>
                   <tbody>
-                    {attribute.map((item, index) => {
+                    {attribute?.map((item, index) => {
                       return(
                         <tr>
                           <td>

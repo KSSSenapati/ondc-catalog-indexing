@@ -6,6 +6,7 @@ import threading
 solr_url = 'http://localhost:8983/solr/ondc'
 solr = pysolr.Solr(solr_url, always_commit=True)
 
+
 def get_solr_params(message):
     message = json.loads(message.value.decode('utf-8'))
     updates = {}
@@ -29,6 +30,7 @@ def get_solr_params(message):
     print(updates, doc)
     return updates, doc
 
+
 def get_solr_params_to_add(message):
     message = json.loads(message.value.decode('utf-8'))
     doc = {}
@@ -48,6 +50,7 @@ def get_solr_params_to_add(message):
     print(doc)
     return doc
 
+
 def addProduct():
     topic = 'addProduct'
     consumer = KafkaConsumer(topic, bootstrap_servers=['localhost:9092'])
@@ -63,8 +66,9 @@ def deleteProduct():
     consumer = KafkaConsumer(topic, bootstrap_servers=['localhost:9092'])
     for message in consumer:
         print(f"Received message in {topic}: {message.value.decode('utf-8')}")
-        doc_id = "doc_" + str(json.loads(message.value.decode('utf-8'))["product_id"])
-        solr.delete(id = doc_id)
+        doc_id = "doc_" + \
+            str(json.loads(message.value.decode('utf-8'))["product_id"])
+        solr.delete(id=doc_id)
 
 
 def updateProduct(topic):
@@ -72,15 +76,17 @@ def updateProduct(topic):
     for message in consumer:
         print(f"Received message in {topic}: {message.value.decode('utf-8')}")
         updates, doc = get_solr_params(message)
-        solr.add([doc], fieldUpdates = updates)
+        solr.add([doc], fieldUpdates=updates)
 
 
 if __name__ == "__main__":
-    topics = ['addProduct', 'deleteProduct', 'updateProduct', 'updateDiscount', 
-              'updateSKU', 'updateRating', 'updateTag', 'updateImage', 'updateAd']
+    topics = ['updateProduct', 'updateDiscount', 'updateSKU',
+              'updateRating', 'updateTag', 'updateImage', 'updateAd']
 
-    threads = [threading.Thread(target=updateProduct, args=(topic,)) for topic in topics]
-    threads += [threading.Thread(target=addProduct), threading.Thread(target=deleteProduct)]
+    threads = [threading.Thread(
+        target=updateProduct, args=(topic,)) for topic in topics]
+    threads += [threading.Thread(target=addProduct),
+                threading.Thread(target=deleteProduct)]
 
     for thread in threads:
         thread.start()

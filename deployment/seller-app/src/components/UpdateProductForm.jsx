@@ -1,4 +1,5 @@
 import Button from 'react-bootstrap/Button';
+import { useLocation } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import { Col } from 'react-bootstrap';
 import { Row }from 'react-bootstrap';
@@ -13,22 +14,25 @@ import ShowModal from './ShowModal';
 import '../config';
 import * as utils from '../utils';
 
-const response = {
-    "product_id": "1323re2",
-    "product_title": "Delight Shirt",
-    "product_type": "Live",
-    "master_category": "apparel",
-    "sub_category": "topwear",
-    "article_type": "tshirts",
-    "attributes": {"fabric": "nylon", "neck": "collar", "fabric 2": "helllo"}, 
-    "price": "100",
-    "discount": "10",
-    "discounted_price": "90",
-    "accelerator_tag": ['hi', 'fwe'],
-    "pincode": ['129001309', '219831983', '31u13u']
-}
+// const response = {
+//     "product_id": "1323re2",
+//     "product_title": "Delight Shirt",
+//     "product_type": "Live",
+//     "master_category": "apparel",
+//     "sub_category": "topwear",
+//     "article_type": "tshirts",
+//     "attributes": {"fabric": "nylon", "neck": "collar", "fabric 2": "helllo"}, 
+//     "price": "100",
+//     "discount": "10",
+//     "discounted_price": "90",
+//     "accelerator_tag": ['hi', 'fwe'],
+//     "pincode": ['129001309', '219831983', '31u13u']
+// }
 
-function UpdateProductForm() {
+const UpdateProductForm = () => {
+  const location = useLocation();
+
+  const response = location.state.response;
   const [productTitle, setProductTitle] = useState(response['product_title'])
 
   const [productType, setProductType] = useState(response['product_type'])
@@ -50,8 +54,8 @@ function UpdateProductForm() {
   const [discount, setDiscount] = useState(response['discount'])
   const [discountedPrice, setDiscountedPrice] = useState(response['discounted_price'])
 
-  const [acceleratorTag, setAcceleratorTag] = useState(response['accelerator_tag'])
-  const [pinCode, setPinCode] = useState(response['pincode'])
+  const [acceleratorTag, setAcceleratorTag] = useState(response['accelerator_tag'] || [])
+  const [pinCode, setPinCode] = useState(response['pincode'] || [])
 
   const [submitStatus, setSubmitStatus] = useState(false)
 
@@ -60,8 +64,6 @@ function UpdateProductForm() {
     updateValue[index] = value;
     setAttributeValue(updateValue);
   }
-
-  
 
   useEffect(() => {
     const new_ = new Array(attribute.length)
@@ -72,21 +74,19 @@ function UpdateProductForm() {
   }, [attribute])
 
   const getAttributes = () => {
-    const finalList = []
+    const _attribute = {};
     attribute.forEach((item, index) => {
       if (attributeValue[index] !==  undefined) {
-        const _attribute = {};
+        
         _attribute[item] = attributeValue[index];
-        finalList.push(_attribute);
       }
     })
-    return finalList;
+    return _attribute;
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const _payload = {
-      "product_id": response['product_id'],
       "product_title": productTitle,
       "product_type": productType,
       "master_category": masterCategory,
@@ -101,9 +101,12 @@ function UpdateProductForm() {
       "main_image" : imageFile
     }
 
-    var diff = (utils.checkArray(response) ? [] : {});
-    utils.recursiveDiff(response, _payload, diff);
-    console.log(diff)
+    const payload_result = utils.getDiff(response, _payload);
+    payload_result["product_id"] = response['product_id']
+    delete payload_result.id
+    delete payload_result.ad_enabled
+    delete payload_result._version_
+    console.log(payload_result)
     setSubmitStatus(true);
 
     const options = {
@@ -112,13 +115,13 @@ function UpdateProductForm() {
         "access-control-allow-origin" : "*",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(_payload)
+      body: JSON.stringify(payload_result)
     }
 
     fetch(global.config.url+"updateProduct", options)
         .then(response => response.json())
         .then(response => console.log(response))
-        .catch(err => console.log(err))
+        .catch(err => console.log(err)) 
   }
 
   const handleEmpty = (option) => {
@@ -182,7 +185,7 @@ function UpdateProductForm() {
                       }
                     }>
                       <option></option>
-                      {masterCategoryList.map((item, index)=> {
+                      {masterCategoryList?.map((item, index)=> {
                         return(
                           <>
                           <option key={index}>{item}</option>
@@ -204,7 +207,7 @@ function UpdateProductForm() {
                       }
                     }>
                       <option></option>
-                      {subCategoryList.length!== 0 && subCategoryList.map((item, index)=> {
+                      {subCategoryList.length!== 0 && subCategoryList?.map((item, index)=> {
                         return(
                           <>
                           <option key={index}>{item}</option>
@@ -232,7 +235,7 @@ function UpdateProductForm() {
                     }
                     }>
                       <option></option>
-                      {articleList.length!== 0 && articleList.map((item, index)=> {
+                      {articleList.length!== 0 && articleList?.map((item, index)=> {
                         return(
                           <>
                           <option key={index}>{item}</option>
@@ -256,7 +259,7 @@ function UpdateProductForm() {
                     </tr>
                   </thead>
                   <tbody>
-                    {attribute.map((item, index) => {
+                    {attribute?.map((item, index) => {
                       return(
                         <tr>
                           <td>
