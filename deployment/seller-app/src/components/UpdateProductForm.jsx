@@ -1,4 +1,5 @@
 import Button from 'react-bootstrap/Button';
+import { useLocation } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import { Col } from 'react-bootstrap';
 import { Row }from 'react-bootstrap';
@@ -10,41 +11,51 @@ import { TagsInput } from 'react-tag-input-component';
 import data from '../data.json';
 import ShowModal from './ShowModal';
 
-const response = {
-    "productTitle": "Delight Shirt", 
-    "masterCategory": "apparel",
-    "subCategory": "topwear",
-    "article": "tshirts",
-    "attribute": [{"fabric": "nylon"}, {"neck": "collar"}, {"fabric 2": "helllo"}],
-    "price": "100",
-    "discount": "10",
-    "discountedPrice": "90",
-    "acceleratorTags": ['hi', 'fwe'],
-    "pinCode": ['129001309', '219831983', '31u13u']
-}
+import '../config';
+import * as utils from '../utils';
 
-function UpdateProductForm() {
-  const [productTitle, setProductTitle] = useState(response['productTitle'])
+// const response = {
+//     "product_id": "1323re2",
+//     "product_title": "Delight Shirt",
+//     "product_type": "Live",
+//     "master_category": "apparel",
+//     "sub_category": "topwear",
+//     "article_type": "tshirts",
+//     "attributes": {"fabric": "nylon", "neck": "collar", "fabric 2": "helllo"}, 
+//     "price": "100",
+//     "discount": "10",
+//     "discounted_price": "90",
+//     "accelerator_tag": ['hi', 'fwe'],
+//     "pincode": ['129001309', '219831983', '31u13u']
+// }
+
+const UpdateProductForm = () => {
+  const location = useLocation();
+
+  const response = location.state.response;
+  const [productTitle, setProductTitle] = useState(response['product_title'])
+
+  const [productType, setProductType] = useState(response['product_type'])
 
   const masterCategoryList = Object.keys(data);
-  const [subCategoryList, setSubCategoryList] = useState(Object.keys(data[response['masterCategory']]))
-  const [articleList, setArticleList] = useState(Object.keys(data[response['masterCategory']][response['subCategory']]))
+  const [subCategoryList, setSubCategoryList] = useState(Object.keys(data[response['master_category']]))
+  const [articleList, setArticleList] = useState(Object.keys(data[response['master_category']][response['sub_category']]))
 
-  const [masterCategory, setMasterCategory] = useState(response['masterCategory'])
-  const [subCategory, setSubCategory] = useState(response['subCategory'])
-  const [article, setArticle] = useState(response['article'])
+  const [masterCategory, setMasterCategory] = useState(response['master_category'])
+  const [subCategory, setSubCategory] = useState(response['sub_category'])
+  const [article, setArticle] = useState(response['article_type'])
 
-  const [attribute, setAttribute] = useState(data[response['masterCategory']][response['subCategory']][response['article']])
+  const [attribute, setAttribute] = useState(data[response['master_category']][response['sub_category']][response['article_type']])
   const [attributeValue, setAttributeValue] = useState([])
 
   const [imageFile, setImageFile] = useState()
 
   const [price, setPrice] = useState(response['price'])
   const [discount, setDiscount] = useState(response['discount'])
-  const [discountedPrice, setDiscountedPrice] = useState(response['discountedPrice'])
+  const [discountedPrice, setDiscountedPrice] = useState(response['discounted_price'])
 
-  const [acceleratorTag, setAcceleratorTag] = useState(response['acceleratorTags'])
-  const [pinCode, setPinCode] = useState(response['pinCode'])
+  const [acceleratorTag, setAcceleratorTag] = useState(response['accelerator_tag'] || [])
+  const [pinCode, setPinCode] = useState(response['pincode'] || [])
 
   const [submitStatus, setSubmitStatus] = useState(false)
 
@@ -54,48 +65,63 @@ function UpdateProductForm() {
     setAttributeValue(updateValue);
   }
 
-  const getAttributeValue = () => {
+  useEffect(() => {
     const new_ = new Array(attribute.length)
-
-    response['attribute'].forEach((item) => {
-        const _item = Object.keys(item)[0];
-        new_[Array.from(attribute).indexOf(_item)] = item[_item];
-    })
-
-    setAttributeValue(new_)
-  }
-
-  useEffect(() => {getAttributeValue();}, [])
+    attribute.forEach((item, index) => {
+      if (Object.keys(response['attributes']).includes(item)) new_[index] = response['attributes'][item]
+    });
+    setAttributeValue(new_);
+  }, [attribute])
 
   const getAttributes = () => {
-    const finalList = []
+    const _attribute = {};
     attribute.forEach((item, index) => {
       if (attributeValue[index] !==  undefined) {
-        const _attribute = {};
+        
         _attribute[item] = attributeValue[index];
-        finalList.push(_attribute);
       }
     })
-    return finalList;
+    return _attribute;
   }
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const _payload = {
-      "productTitle": productTitle,
-      "masterCategory": masterCategory,
-      "subCategory": subCategory,
-      "article": article,
-      "attribute": getAttributes(),
+      "product_title": productTitle,
+      "product_type": productType,
+      "master_category": masterCategory,
+      "sub_category": subCategory,
+      "article_type": article,
+      "attributes": getAttributes(),
       "price": price,
       "discount": discount,
-      "discountedPrice": discountedPrice,
-      "acceleratorTags": acceleratorTag,
-      "pinCode": pinCode,
-      "image" : imageFile
+      "discounted_price": discountedPrice,
+      "accelerator_tag": acceleratorTag,
+      "pincode": pinCode,
+      "main_image" : imageFile
     }
+
+    const payload_result = utils.getDiff(response, _payload);
+    payload_result["product_id"] = response['product_id']
+    delete payload_result.id
+    delete payload_result.ad_enabled
+    delete payload_result._version_
+    console.log(payload_result)
     setSubmitStatus(true);
-    console.log(_payload);
+
+    const options = {
+      method: 'post',
+      headers: {
+        "access-control-allow-origin" : "*",
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(payload_result)
+    }
+
+    fetch(global.config.url+"updateProduct", options)
+        .then(response => response.json())
+        .then(response => console.log(response))
+        .catch(err => console.log(err)) 
   }
 
   const handleEmpty = (option) => {
@@ -125,15 +151,27 @@ function UpdateProductForm() {
 
   return (
     <Form onSubmit={(e) => handleSubmit(e)} className="pb-6">
-      {submitStatus && <ShowModal modalBody="Your product id is" onClose={()=> setSubmitStatus(false)} modalShow={submitStatus} />}
+      {submitStatus && <ShowModal modalTitle="Update Successful" modalContent={`Your product id ${response['product_id']} has been updated.`} onClose={()=> setSubmitStatus(false)} modalShow={submitStatus} />}
         <Row>
         <h3 className='mb-3'>Update Product Form</h3>
         <Col md = {8}>
             <Row>
+                <Col md={8}>
                 <Form.Group className="mb-3" controlId="formProductTitle">
                     <Form.Label>Product Title</Form.Label>
-                    <Form.Control required value={productTitle} type="text" placeholder="Enter Title" onChange={e => setProductTitle(e.target.value)}/>
+                    <Form.Control required type="text" value={productTitle} placeholder="Enter Title" onChange={e => setProductTitle(e.target.value)}/>
                 </Form.Group>
+              </Col>
+              <Col>
+                <Form.Group className="mb-3" controld="formMasterCategory" >
+                    <Form.Label>Set Product Type</Form.Label>
+                    <Form.Select required value={productType} onChange={(e) => setProductType(e.target.value)}>
+                      <option></option>
+                      <option>Live</option>
+                      <option>Non-Live</option>
+                    </Form.Select>
+                  </Form.Group>
+              </Col>
             </Row>
 
             {/* Master Category Dropdown Start*/}
@@ -147,7 +185,7 @@ function UpdateProductForm() {
                       }
                     }>
                       <option></option>
-                      {masterCategoryList.map((item, index)=> {
+                      {masterCategoryList?.map((item, index)=> {
                         return(
                           <>
                           <option key={index}>{item}</option>
@@ -169,7 +207,7 @@ function UpdateProductForm() {
                       }
                     }>
                       <option></option>
-                      {subCategoryList.length!== 0 && subCategoryList.map((item, index)=> {
+                      {subCategoryList.length!== 0 && subCategoryList?.map((item, index)=> {
                         return(
                           <>
                           <option key={index}>{item}</option>
@@ -197,7 +235,7 @@ function UpdateProductForm() {
                     }
                     }>
                       <option></option>
-                      {articleList.length!== 0 && articleList.map((item, index)=> {
+                      {articleList.length!== 0 && articleList?.map((item, index)=> {
                         return(
                           <>
                           <option key={index}>{item}</option>
@@ -221,7 +259,7 @@ function UpdateProductForm() {
                     </tr>
                   </thead>
                   <tbody>
-                    {attribute.map((item, index) => {
+                    {attribute?.map((item, index) => {
                       return(
                         <tr>
                           <td>
@@ -254,7 +292,7 @@ function UpdateProductForm() {
               <Col>
                 <Form.Group className="mb-3" controlId="formDiscount">
                     <Form.Label>Discount (%) </Form.Label>
-                    <Form.Control type="number" value={discount} disabled={price==="0"} min="0" max="100" value={discount} placeholder="Enter Discount(%)" onChange={(e) => {
+                    <Form.Control type="number" value={discount} disabled={price==="0"} min="0" max="100" placeholder="Enter Discount(%)" onChange={(e) => {
                       setDiscount(e.target.value);
                       setDiscountedPrice((1-(0.01 * e.target.value))* price);
                       }
@@ -264,7 +302,7 @@ function UpdateProductForm() {
               <Col>
                 <Form.Group className="mb-3" controlId="formDiscountedPrice">
                     <Form.Label>Discounted Price (INR) </Form.Label>
-                    <Form.Control type="number" value={discountedPrice} disabled={price==="0"} min="0" max={price} value={discountedPrice} placeholder="Enter Discounted Price (INR)" onChange={(e) => {
+                    <Form.Control type="number" value={discountedPrice} disabled={price==="0"} min="0" placeholder="Enter Discounted Price (INR)" onChange={(e) => {
                       setDiscountedPrice(e.target.value);
                       setDiscount((1 - e.target.value/price) * 100);
                       }

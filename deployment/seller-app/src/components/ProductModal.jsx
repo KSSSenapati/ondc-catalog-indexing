@@ -4,25 +4,47 @@ import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useNavigate } from 'react-router-dom';
 
+import ShowModal from './ShowModal';
+
+import '../config';
+
 function VerticallyCenteredModal(props) {
   const navigate = useNavigate();
     const [productId, setProductId] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        
         if(productId !== ""){
+          props.onHide();
           switch(props.option){
             case "Update":
-              console.log("update");
-              navigate('/updateProduct');
+              const _options = {
+                method: 'post',
+                headers: {
+                  "access-control-allow-origin" : "*",
+                  "Content-Type": "application/json"
+                },
+                body: JSON.stringify({"product_id": productId})
+              }
+              fetch(global.config.url+"queryProduct", _options)
+                .then(response => response.json())
+                .then(data => {
+                  console.log(`raw: ${data.message}`)
+                  navigate('/updateProduct', {state: {response: data.message}} )
+                })
+                .catch(err => console.log(err))
               break;
             case "Delete":
-              console.log("delete");
+              fetch(global.config.url+"deleteProduct/"+productId, {method: 'delete'})
+                .then(response => response.json())
+                .then(data => {return(<ShowModal modalTitle="Delte Product" modalShow={true} modalContent={`Your Product ID ${productId} has been deleted.`}/>)})
+                .catch(err => console.log(err))
               break;
             default:
               return 0;
           }
-          props.onHide();
+          
         }
     }
 
