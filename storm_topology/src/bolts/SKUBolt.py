@@ -8,7 +8,7 @@ class SKUBolt(Bolt):
         product_id, sku = tup.values[0]
         if product_id is not None and sku is not None:
             doc = {'id': f'doc_{product_id}'}
-            update['sizesCount'] = 'set'
+            update['sizes_facet'] = 'set'
             doc['sizes_facet'] = list(sku)
             for size in list(sku):
                 update[f'{size}_size_count'] = 'set'

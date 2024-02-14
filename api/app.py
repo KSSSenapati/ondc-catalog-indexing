@@ -81,15 +81,15 @@ def price_handler(message):
 
 
 kafka_map = {
-    'updateAttribute': {'fields': ['attribute', 'handler': None]},
-    'updateDiscount': {'fields': ['discount', 'sale_discount'], 'handler': None},
+    'updateAttribute': {'fields': ['attributes', 'handler': None]},
+    'updateDiscount': {'fields': ['discount', 'sale_discount', 'discounted_price', 'sale_discounted_price'], 'handler': None},
     'updateSKU': {'fields': ['sizesCount'], 'handler': sku_handler},
     'updateRating': {'fields': ['rating'], 'handler': None},
     'updateTag': {'fields': ['accelerator_tag'], 'handler': tag_handler},
     'updateAd': {'fields': ['ad_enabled'], 'handler': None},
     'updateImage': {'fields': ['main_image'], 'handler': image_handler},
     'updateProduct': {'fields': ['product_title', 'master_category', 'sub_category',
-        'article', 'price', 'pincode'], 'handler': price_handler},
+        'article_type', 'price', 'pincode'], 'handler': price_handler},
 }
 
 
@@ -102,7 +102,7 @@ async def addProduct(request: Request):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="product_id is required")
 
-        body['product_id'] = '1234'
+        body['product_id'] = body.get('product_id')
         producer.send('addProduct', value=json.dumps(body).encode('utf-8'))
         producer.flush()
         return {'status': 'success', 'message': 'Add successful'}
@@ -124,7 +124,7 @@ async def queryProduct(request: Request):
         if len(results.docs):
             docs = results.docs[0]
         else:
-            raise raise HTTPException(
+            raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST, detail="Document not found")
         return {'status': 'success', 'message': docs}
     except Exception as e:
