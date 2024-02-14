@@ -4,7 +4,7 @@ input=$1
 
 if [[ $input == "addProduct" ]]; then
     curl -X POST -H "Content-Type: application/json" \
-    -d '{"product_title": "Ponds"}' \
+    -d '{"product_id":"10001", "product_title": "Ponds"}' \
     http://localhost:8000/addProduct
 fi
 
@@ -18,7 +18,7 @@ fi
 
 if [[ $input == "deleteProduct" ]]; then
     curl -X DELETE -H "Content-Type: application/json" \
-    http://localhost:8000/deleteProduct/1
+    http://localhost:8000/deleteProduct/doc_1234
 fi
 
 
