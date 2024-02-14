@@ -28,24 +28,68 @@ app.add_middleware(
 
 def image_handler(message):
     collection = db["image"]
-    if message.get("main_image") is None:
+    product_id = message.get("product_id")
+    main_image = message.get("main_image")
+    if product_id is None or main_image is None:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="product_id is required")
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="product_id and main_image fields are required")
     document = {
-        "product_id": message["product_id"], "image_path": message["main_image"]}
+        "product_id": product_id, "main_image": main_image}
     result = collection.insert_one(document)
-    return str(result.inserted_id)
+
+
+def tag_handler(message):
+    collection = db["accelerator_tag"]
+    product_id = message.get("product_id")
+    accelerator_tag = message.get("accelerator_tag")
+    if product_id is None or tag is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="product_id and accelerator_tag fields are required")
+    document = {
+        "product_id": product_id, "accelerator_tag": accelerator_tag}
+    result = collection.insert_one(document)
+
+
+def sku_handler(message):
+    collection = db["sku"]
+    product_id = message.get("product_id")
+    sizesCount = message.get("sizesCount")
+    if product_id is None or sizesCount is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="product_id and sizesCount fields are required")
+    document = {
+        "product_id": product_id, "sizesCount": sizesCount}
+    result = collection.insert_one(document)
+
+
+def price_handler(message):
+    collection = db["price"]
+    product_id = message.get("product_id")
+    price = message.get("price")
+    if price is None:
+        return
+    if product_id is None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, 
+            detail="product_id and price fields are required")
+    document = {
+        "product_id": product_id, "price": price}
+    result = collection.insert_one(document)
 
 
 kafka_map = {
+    'updateAttribute': {'fields': ['attribute', 'handler': None]},
     'updateDiscount': {'fields': ['discount', 'sale_discount'], 'handler': None},
-    'updateSKU': {'fields': ['sizesCount'], 'handler': None},
+    'updateSKU': {'fields': ['sizesCount'], 'handler': sku_handler},
     'updateRating': {'fields': ['rating'], 'handler': None},
-    'updateTag': {'fields': ['accelerator_tag'], 'handler': None},
+    'updateTag': {'fields': ['accelerator_tag'], 'handler': tag_handler},
     'updateAd': {'fields': ['ad_enabled'], 'handler': None},
     'updateImage': {'fields': ['main_image'], 'handler': image_handler},
     'updateProduct': {'fields': ['product_title', 'master_category', 'sub_category',
-        'article', 'attribute', 'price', 'pincode'], 'handler': None},
+        'article', 'price', 'pincode'], 'handler': price_handler},
 }
 
 
@@ -117,7 +161,7 @@ async def updateProduct(request: Request):
                 continue
             message['product_id'] = body.get('product_id')
             if opts['handler'] is not None:
-                message['main_image'] = opts['handler'](message)
+                opts['handler'](message)
             producer.send(topic, value=json.dumps(message).encode('utf-8'))
             producer.flush()
         return {'status': 'success', 'message': 'Update successful'}
