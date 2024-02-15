@@ -1,26 +1,28 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col'
-import { Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import GlowCard from '../components/GlowCard';
+
 import ProductModal from '../components/ProductModal';
 import Header from '../components/Header';
+import '../style/home2.css'
 
 const Home = () => {
+    const navigate = useNavigate();
+    const handleSubmit = (e) => {
+        e.preventDefault()
+        navigate('/addProduct');
+    }
     return(
         <>
             <Header />
             <Container>
-            <h2> Function </h2>
-            <Row>
-                <Col>
-                    <Link to="/addProduct">
-                        <Button variant="outline-primary">Add Product</Button>
-                    </Link>
-                </Col>
-                <Col><ProductModal option="Update" /></Col>
-                <Col><ProductModal option="Delete" /></Col>
-            </Row>
+                <Row className='glow-container'>
+                    <Col><GlowCard title='Add Product' icon='fa fa-plus-circle' description='hello' buttonFunction={(e) => handleSubmit(e)} /></Col>
+                    <Col><ProductModal option="Update" /></Col>
+                    <Col><ProductModal option="Delete" /></Col>
+                </Row>
             </Container>
         </>
     )

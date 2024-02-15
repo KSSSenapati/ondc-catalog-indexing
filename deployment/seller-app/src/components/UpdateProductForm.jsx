@@ -12,7 +12,6 @@ import data from '../data.json';
 import ShowModal from './ShowModal';
 
 import '../config';
-import * as utils from '../utils';
 
 // const response = {
 //     "product_id": "1323re2",
@@ -101,26 +100,18 @@ const UpdateProductForm = () => {
       "main_image" : imageFile
     }
 
-    const payload_result = utils.getDiff(response, _payload);
-    payload_result["product_id"] = response['product_id']
-    delete payload_result.id
-    delete payload_result.ad_enabled
-    delete payload_result._version_
-    console.log(payload_result)
-    setSubmitStatus(true);
-
     const options = {
       method: 'post',
       headers: {
         "access-control-allow-origin" : "*",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload_result)
+      body: JSON.stringify(_payload)
     }
 
     fetch(global.config.url+"updateProduct", options)
         .then(response => response.json())
-        .then(response => console.log(response))
+        .then(response => setSubmitStatus(true))
         .catch(err => console.log(err)) 
   }
 
