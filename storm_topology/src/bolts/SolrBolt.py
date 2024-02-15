@@ -2,7 +2,9 @@ from streamparse import Bolt
 import json
 import pysolr
 
-class UpdateBolt(Bolt):
+class SolrBolt(Bolt):
+    outputs = ['default']
+
     def initialize(self, stormconf, context):
         solr_url = 'http://localhost:8983/solr/ondc'
         self.solr = pysolr.Solr(solr_url, always_commit=True)

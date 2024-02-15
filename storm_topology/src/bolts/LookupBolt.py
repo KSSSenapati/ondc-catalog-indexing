@@ -2,7 +2,7 @@ from streamparse import Bolt
 from pymongo import MongoClient
 
 class LookupBolt(Bolt):
-    outputs = ['product_id', 'lookup_output']
+    outputs = ['message']
 
     def initialize(self, stormconf, context):
         self.mongo_client = MongoClient('localhost', 27017)
@@ -16,5 +16,5 @@ class LookupBolt(Bolt):
         prod_id = message.get('product_id')
         doc = self.collection.find_one({'product_id': prod_id})
         if doc and self.lookup_attr in doc:
-            output = doc[self.lookup_attr]
-            self.emit([prod_id, output])
+            message[self.lookup_attr] = doc[self.lookup_attr]
+            self.emit([message])

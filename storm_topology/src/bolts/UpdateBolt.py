@@ -1,6 +1,8 @@
 from streamparse import Bolt
 
 class UpdateBolt(Bolt):
+    outputs = ['solr']
+
     def initialize(self, stormconf, context):
         pass
     
@@ -15,4 +17,4 @@ class UpdateBolt(Bolt):
                     continue
                 update[key] = 'set'
                 doc[key] = value
-            self.emit({'product_id': product_id, 'doc': doc, 'update': update})
+            self.emit({'doc': doc, 'update': update})
