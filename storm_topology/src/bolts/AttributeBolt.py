@@ -1,6 +1,8 @@
 from streamparse import Bolt
 
 class AttributeBolt(Bolt):
+    outputs = ['solr']
+
     def initialize(self, stormconf, context):
         pass
 
@@ -14,4 +16,4 @@ class AttributeBolt(Bolt):
             for attr in list(attribute):
                 doc[f'{attr}_atsa'] = attribute[attr]
                 update[f'{attr}_atsa'] = 'set'
-            self.emit({'product_id': product_id, 'doc': doc, 'update': update})
+            self.emit({'doc': doc, 'update': update})

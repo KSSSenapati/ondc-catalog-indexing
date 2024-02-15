@@ -11,7 +11,7 @@ from bolts.SolrBolt import SolrBolt
 class DiscountTopology(Topology):
     kafka_spout = KafkaSpout.spec(config={'topic': 'updateDiscount'})
     lookup_bolt = LookupBolt.spec(config={'lookup_attr': 'price'}, inputs=[kafka_spout])
-    discount_bolt = DiscountBolt.spec(inputs=[lookup_bolt, kafka_spout])
+    discount_bolt = DiscountBolt.spec(inputs=[lookup_bolt])
     solr_bolt = SolrBolt.spec(inputs=[discount_bolt])
 
     def define_topology(self):

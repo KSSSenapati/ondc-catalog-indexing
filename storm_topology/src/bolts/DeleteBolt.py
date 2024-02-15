@@ -9,7 +9,7 @@ class DeleteBolt(Bolt):
 
     def process(self, tup):
         message = json.loads(tup.values[0])
-        if message['product_id']:
+        if message['product_id'] is not None:
             try:
                 doc_id = f'doc_{message["product_id"]}'
                 solr.delete(id=doc_id)

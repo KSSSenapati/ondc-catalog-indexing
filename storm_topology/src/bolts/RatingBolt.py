@@ -1,6 +1,8 @@
 from streamparse import Bolt
 
 class RatingBolt(Bolt):
+    outputs = ['solr']
+
     def initialize(self, stormconf, context):
         pass
 
@@ -11,5 +13,4 @@ class RatingBolt(Bolt):
         if product_id is not None and rating is not None:
             doc = {'id': f'doc_{product_id}', 'rating': rating}
             update = {'rating': 'set'}
-            self.emit({'product_id': product_id, 'doc': doc, 'update': update})
-
+            self.emit({'doc': doc, 'update': update})

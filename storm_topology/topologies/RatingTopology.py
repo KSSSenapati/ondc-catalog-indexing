@@ -9,7 +9,7 @@ from bolts.SolrBolt import SolrBolt
 
 class RatingTopology(Topology):
     kafka_spout = KafkaSpout.spec(config={'topic': 'updateRating'})
-    rating_bolt = RatingBolt.spec(inputs=[lookup_bolt])
+    rating_bolt = RatingBolt.spec(inputs=[kafka_spout])
     solr_bolt = SolrBolt.spec(inputs=[rating_bolt])
 
     def define_topology(self):

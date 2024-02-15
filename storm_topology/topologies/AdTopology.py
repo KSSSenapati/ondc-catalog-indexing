@@ -9,7 +9,7 @@ from bolts.SolrBolt import SolrBolt
 
 class AdTopology(Topology):
     kafka_spout = KafkaSpout.spec(config={'topic': 'updateAd'})
-    ad_bolt = AdBolt.spec(inputs=[lookup_bolt])
+    ad_bolt = AdBolt.spec(inputs=[kafka_spout])
     solr_bolt = SolrBolt.spec(inputs=[ad_bolt])
 
     def define_topology(self):
