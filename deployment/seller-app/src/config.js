@@ -1,3 +1,3 @@
 module.exports = global.config ={
-    url: "http://127.0.0.1:8000/"
+    url: "http://35.209.236.51:8000/"
 }

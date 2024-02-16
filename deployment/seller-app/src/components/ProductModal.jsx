@@ -3,6 +3,7 @@ import Modal from 'react-bootstrap/Modal';
 import { useState } from 'react';
 import Form from 'react-bootstrap/Form';
 import { useNavigate } from 'react-router-dom';
+import GlowCard from './GlowCard';
 
 import ShowModal from './ShowModal';
 
@@ -75,11 +76,11 @@ function VerticallyCenteredModal(props) {
 function ProductModal({option}) {
   const [modalShow, setModalShow] = useState(false);
 
+  const icons = {'Update': {_icon: 'fa fa-pencil', _description:"Helps in updating"}, 'Delete': {_icon: 'fa fa-trash', _description: 'helps in deleting Product'}}
+
   return (
     <>
-      <Button variant="outline-primary" onClick={() => setModalShow(true)}>
-        {option} Product
-      </Button>
+      <GlowCard title={`${option} Product`} icon={icons[option]._icon} description={icons[option]._description} buttonFunction={()=>setModalShow(true)} />
 
       <VerticallyCenteredModal
         show={modalShow}

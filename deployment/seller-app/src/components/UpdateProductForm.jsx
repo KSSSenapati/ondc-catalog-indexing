@@ -12,7 +12,6 @@ import data from '../data.json';
 import ShowModal from './ShowModal';
 
 import '../config';
-import * as utils from '../utils';
 
 // const response = {
 //     "product_id": "1323re2",
@@ -101,26 +100,18 @@ const UpdateProductForm = () => {
       "main_image" : imageFile
     }
 
-    const payload_result = utils.getDiff(response, _payload);
-    payload_result["product_id"] = response['product_id']
-    delete payload_result.id
-    delete payload_result.ad_enabled
-    delete payload_result._version_
-    console.log(payload_result)
-    setSubmitStatus(true);
-
     const options = {
       method: 'post',
       headers: {
         "access-control-allow-origin" : "*",
         "Content-Type": "application/json"
       },
-      body: JSON.stringify(payload_result)
+      body: JSON.stringify(_payload)
     }
 
     fetch(global.config.url+"updateProduct", options)
         .then(response => response.json())
-        .then(response => console.log(response))
+        .then(response => setSubmitStatus(true))
         .catch(err => console.log(err)) 
   }
 
@@ -284,7 +275,7 @@ const UpdateProductForm = () => {
                     <Form.Control required value={price} type="number" min="0" placeholder="Enter Price" onChange={(e) => {
                       const val_ = e.target.value;
                       setPrice(val_);
-                      if (discount !== 0) setDiscountedPrice((1-(0.01 * discount))* val_);
+                      if (discount !== 0) setDiscountedPrice(((1-(0.01 * discount))* val_).toFixed(2));
                       }
                     }/>
                 </Form.Group>
@@ -292,9 +283,9 @@ const UpdateProductForm = () => {
               <Col>
                 <Form.Group className="mb-3" controlId="formDiscount">
                     <Form.Label>Discount (%) </Form.Label>
-                    <Form.Control type="number" value={discount} disabled={price==="0"} min="0" max="100" placeholder="Enter Discount(%)" onChange={(e) => {
+                    <Form.Control type="number" value={discount} disabled={price==="0"} step="0.01" min="0" max="100" placeholder="Enter Discount(%)" onChange={(e) => {
                       setDiscount(e.target.value);
-                      setDiscountedPrice((1-(0.01 * e.target.value))* price);
+                      setDiscountedPrice(((1-(0.01 * e.target.value))* price).toFixed(2));
                       }
                     }/>
                 </Form.Group>
@@ -302,9 +293,9 @@ const UpdateProductForm = () => {
               <Col>
                 <Form.Group className="mb-3" controlId="formDiscountedPrice">
                     <Form.Label>Discounted Price (INR) </Form.Label>
-                    <Form.Control type="number" value={discountedPrice} disabled={price==="0"} min="0" placeholder="Enter Discounted Price (INR)" onChange={(e) => {
+                    <Form.Control type="number" value={discountedPrice} disabled={price==="0"} step="0.01" min="0" placeholder="Enter Discounted Price (INR)" onChange={(e) => {
                       setDiscountedPrice(e.target.value);
-                      setDiscount((1 - e.target.value/price) * 100);
+                      setDiscount(((1 - e.target.value/price) * 100).toFixed(2));
                       }
                     }/>
                 </Form.Group>
