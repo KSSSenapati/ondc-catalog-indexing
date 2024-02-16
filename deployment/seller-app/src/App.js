@@ -7,6 +7,7 @@ import {
 import Home from './pages/Home';
 import AddProduct from "./pages/AddProduct";
 import UpdateProduct from "./pages/UpdateProduct";
+import Footer from "./components/Footer";
 
 const router = createBrowserRouter([
   {
@@ -27,6 +28,7 @@ function App() {
   return (
     <>
       <RouterProvider router={router} />
+      <Footer />
     </>
   );
 }
