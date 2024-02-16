@@ -19,7 +19,7 @@ const Home = () => {
             <Header />
             <Container>
                 <Row className='glow-container'>
-                    <Col><GlowCard title='Add Product' icon='fa fa-plus-circle' description='hello' buttonFunction={(e) => handleSubmit(e)} /></Col>
+                    <Col><GlowCard title='Add Product' icon='fa fa-plus-circle' description='You can onboard a new product your catalog from here.' buttonFunction={(e) => handleSubmit(e)} /></Col>
                     <Col><ProductModal option="Update" /></Col>
                     <Col><ProductModal option="Delete" /></Col>
                 </Row>
