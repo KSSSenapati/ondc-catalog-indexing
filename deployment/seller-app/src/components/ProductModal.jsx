@@ -76,7 +76,7 @@ function VerticallyCenteredModal(props) {
 function ProductModal({option}) {
   const [modalShow, setModalShow] = useState(false);
 
-  const icons = {'Update': {_icon: 'fa fa-pencil', _description:"Helps in updating"}, 'Delete': {_icon: 'fa fa-trash', _description: 'helps in deleting Product'}}
+  const icons = {'Update': {_icon: 'fa fa-pencil', _description:"You can update details about your product here."}, 'Delete': {_icon: 'fa fa-trash', _description: 'You can remove a product from your catalog here.'}}
 
   return (
     <>

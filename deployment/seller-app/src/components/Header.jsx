@@ -6,9 +6,9 @@ import { useNavigate } from 'react-router-dom';
 function Header() {
   const navigate = useNavigate();
   return (
-    <Navbar expand="lg" className="bg-body-tertiary " style={{cursor: 'pointer'}} >
+    <Navbar expand="lg" className="bg-body-tertiary " style={{cursor: 'pointer', marginBottom: "5rem"}}>
       <Container >
-        <Navbar.Brand onClick={() => navigate('/')}>Seller Application</Navbar.Brand>
+        <Navbar.Brand onClick={() => navigate('/')}><img src={`${process.env.PUBLIC_URL}/assets/cyborg_logo_black.png`} alt="logo" height={50} style={{marginRight: "30px"}}/>Seller Application</Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">
           <Nav
@@ -17,7 +17,7 @@ function Header() {
             navbarScroll
           >
             <Nav.Link href="/">Home</Nav.Link>
-            <Nav.Link href="/">Contact Us</Nav.Link>
+            <Nav.Link href="#footer">Contact Us</Nav.Link>
           </Nav>
         </Navbar.Collapse>
       </Container>
