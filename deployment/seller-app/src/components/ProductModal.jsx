@@ -8,14 +8,17 @@ import GlowCard from './GlowCard';
 import ShowModal from './ShowModal';
 
 import '../config';
+import Loader from './Loader';
 
 function VerticallyCenteredModal(props) {
   const navigate = useNavigate();
     const [productId, setProductId] = useState("");
     const [childModalShow, setChildModalShow] = useState(false);
+    const [loader, setLoader] = useState(false)
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        setLoader(true);
         props.onHide();
         
         if(productId !== ""){
@@ -31,16 +34,24 @@ function VerticallyCenteredModal(props) {
                 body: JSON.stringify({"product_id": productId})
               }
               fetch(global.config.url+"queryProduct", _options)
-                .then(response => response.json())
+                .then((response) => {
+                  setLoader(false);
+                  return response.json();
+                })
                 .then(data => {
-                  console.log(`raw: ${data.message}`)
-                  navigate('/updateProduct', {state: {response: data.message}} )
+                  try {
+                    console.log(`raw: ${data.status}`)
+                    if(data.status === 'success') navigate('/updateProduct', {state: {response: data.message}} )
+                  } catch(error) {console.log(error)}
                 })
                 .catch(err => console.log(err))
               break;
             case "Delete":
               fetch(global.config.url+"deleteProduct/"+productId, {method: 'delete'})
-                .then(response => response.json())
+                .then((response) => {
+                  setLoader(false);
+                  return response.json()
+                })
                 .then(data => setChildModalShow(true))
                 .catch(err => console.log(err))
               break;
@@ -53,6 +64,7 @@ function VerticallyCenteredModal(props) {
 
     return (
       <>
+        {loader && <Loader />}
         <ShowModal modalTitle={`${props.option} Product`} modalShow={childModalShow} onClose={()=>setChildModalShow(false)} modalContent={`Your Product ID ${productId} has been ${props.option}d.`}/>
         <Modal
         {...props}

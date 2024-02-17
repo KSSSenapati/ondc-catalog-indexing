@@ -6,6 +6,7 @@ import { ImageUpload } from './ImageUpload';
 import { useState } from 'react';
 import Table from "react-bootstrap/Table";
 import { TagsInput } from 'react-tag-input-component';
+import Loader from './Loader.jsx';
 
 import data from '../data.json';
 import ShowModal from './ShowModal';
@@ -15,6 +16,8 @@ import '../config.js';
 var randomize = require('randomatic');
 
 function AddProductForm() {
+  const [loader, setLoader] = useState(false)
+
   const [productId, setProductId] = useState("")
   const [productTitle, setProductTitle] = useState("")
 
@@ -61,6 +64,7 @@ function AddProductForm() {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoader(true);
     const _id = randomize('0', 8)
     setProductId(_id);
     const _payload = {
@@ -78,7 +82,6 @@ function AddProductForm() {
       "pincode": pinCode,
       "main_image" : imageFile
     }
-    setSubmitStatus(true);
     const options = {
       method: 'post',
       headers: {
@@ -90,8 +93,13 @@ function AddProductForm() {
 
     console.log(options.body);
     fetch(global.config.url+"addProduct", options)
-      .then(response => response.json())
-      .then(response => console.log(response))
+      .then((response) => {
+        setLoader(false);
+        return response.json();
+      })
+      .then((response) => {
+        if (response.status === 'success') setSubmitStatus(true);
+      })
       .catch(err => console.log(err))
   }
 
@@ -129,6 +137,8 @@ function AddProductForm() {
   }
 
   return (
+    <>
+    {loader && <Loader />}
     <Form onSubmit={(e) => handleSubmit(e)} className="pb-6">
       {submitStatus && <ShowModal modalContent={`Your Product id is ${productId}`} onClose={()=> setSubmitStatus(false)} modalShow={submitStatus} modalTitle="Successful Product Addition" />}
         <Row>
@@ -325,6 +335,7 @@ function AddProductForm() {
         </Col>
         </Row>
     </Form>
+    </>
   );
 }
 

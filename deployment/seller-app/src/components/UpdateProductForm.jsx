@@ -12,6 +12,7 @@ import data from '../data.json';
 import ShowModal from './ShowModal';
 
 import '../config';
+import Loader from './Loader';
 
 // const response = {
 //     "product_id": "1323re2",
@@ -30,6 +31,7 @@ import '../config';
 
 const UpdateProductForm = () => {
   const location = useLocation();
+  const [loader, setLoader] = useState(false);
 
   const response = location.state.response;
   const [productTitle, setProductTitle] = useState(response['product_title'])
@@ -85,6 +87,7 @@ const UpdateProductForm = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    setLoader(true);
     const _payload = {
       "product_id": response['product_id'],
       "product_title": productTitle,
@@ -111,7 +114,10 @@ const UpdateProductForm = () => {
     }
 
     fetch(global.config.url+"updateProduct", options)
-        .then(response => response.json())
+        .then((response) => {
+          setLoader(false);
+          return response.json();
+        })
         .then(response => setSubmitStatus(true))
         .catch(err => console.log(err)) 
   }
@@ -142,6 +148,8 @@ const UpdateProductForm = () => {
   }
 
   return (
+    <>
+    {loader && <Loader /> }
     <Form onSubmit={(e) => handleSubmit(e)} className="pb-6">
       {submitStatus && <ShowModal modalTitle="Update Successful" modalContent={`Your product id ${response['product_id']} has been updated.`} onClose={()=> setSubmitStatus(false)} modalShow={submitStatus} />}
         <Row>
@@ -338,6 +346,7 @@ const UpdateProductForm = () => {
         </Col>
         </Row>
     </Form>
+  </>
   );
 }
 
