@@ -12,9 +12,11 @@ import '../config';
 function VerticallyCenteredModal(props) {
   const navigate = useNavigate();
     const [productId, setProductId] = useState("");
+    const [childModalShow, setChildModalShow] = useState(false);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        props.onHide();
         
         if(productId !== ""){
           props.onHide();
@@ -39,7 +41,7 @@ function VerticallyCenteredModal(props) {
             case "Delete":
               fetch(global.config.url+"deleteProduct/"+productId, {method: 'delete'})
                 .then(response => response.json())
-                .then(data => {return(<ShowModal modalTitle="Delte Product" modalShow={true} modalContent={`Your Product ID ${productId} has been deleted.`}/>)})
+                .then(data => setChildModalShow(true))
                 .catch(err => console.log(err))
               break;
             default:
@@ -50,6 +52,8 @@ function VerticallyCenteredModal(props) {
     }
 
     return (
+      <>
+        <ShowModal modalTitle={`${props.option} Product`} modalShow={childModalShow} onClose={()=>setChildModalShow(false)} modalContent={`Your Product ID ${productId} has been ${props.option}d.`}/>
         <Modal
         {...props}
         size="lg"
@@ -70,6 +74,7 @@ function VerticallyCenteredModal(props) {
             </Modal.Footer>
             </Form>
         </Modal>
+        </>
     );
 }
 

@@ -70,7 +70,7 @@ const UpdateProductForm = () => {
       if (Object.keys(response['attributes']).includes(item)) new_[index] = response['attributes'][item]
     });
     setAttributeValue(new_);
-  }, [attribute])
+  }, [attribute, response])
 
   const getAttributes = () => {
     const _attribute = {};
@@ -86,6 +86,7 @@ const UpdateProductForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const _payload = {
+      "product_id": response['product_id'],
       "product_title": productTitle,
       "product_type": productType,
       "master_category": masterCategory,
