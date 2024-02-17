@@ -2,32 +2,32 @@ import  "../style/footer.css";
 
 const Footer = () => {
     return(
-        <footer class="footer-section" id="footer">
-        <div class="container">
-            <div class="footer-cta pt-5 pb-5">
-                <div class="row">
-                    <div class="col-xl-4 col-md-4 mb-30">
-                        <div class="single-cta">
-                            <i class="fas fa-map-marker-alt"></i>
-                            <div class="cta-text">
+        <footer className="footer-section" id="footer">
+        <div className="container">
+            <div className="footer-cta pt-5 pb-5">
+                <div className="row">
+                    <div className="col-xl-4 col-md-4 mb-30">
+                        <div className="single-cta">
+                            <i className="fas fa-map-marker-alt"></i>
+                            <div className="cta-text">
                                 <h4>Find us</h4>
                                 <span>Bangalore, India</span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-4 col-md-4 mb-30">
-                        <div class="single-cta">
-                            <i class="fas fa-phone"></i>
-                            <div class="cta-text">
+                    <div className="col-xl-4 col-md-4 mb-30">
+                        <div className="single-cta">
+                            <i className="fas fa-phone"></i>
+                            <div className="cta-text">
                                 <h4>Call us</h4>
                                 <span>(+91) 7008789055</span>
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-4 col-md-4 mb-30">
-                        <div class="single-cta">
-                            <i class="far fa-envelope-open"></i>
-                            <div class="cta-text">
+                    <div className="col-xl-4 col-md-4 mb-30">
+                        <div className="single-cta">
+                            <i className="far fa-envelope-open"></i>
+                            <div className="cta-text">
                                 <h4>Mail us</h4>
                                 <span>sntnsenapati@gmail.com</span>
                             </div>
@@ -35,17 +35,17 @@ const Footer = () => {
                     </div>
                 </div>
             </div>
-            <div class="footer-content pt-5 pb-5">
-                <div class="row">
-                    <div class="col-xl-4 col-lg-4 mb-50">
-                        <div class="footer-widget">
-                            <div class="footer-logo">
-                                <img src={`${process.env.PUBLIC_URL}/assets/cyborg_logo_white.png`} class="img-fluid" alt="logo" />
+            <div className="footer-content pt-5 pb-5">
+                <div className="row">
+                    <div className="col-xl-4 col-lg-4 mb-50">
+                        <div className="footer-widget">
+                            <div className="footer-logo">
+                                <img src={`${process.env.PUBLIC_URL}/assets/cyborg_logo_white.png`} className="img-fluid" alt="logo" />
                             </div>
-                            <div class="footer-text">
+                            <div className="footer-text">
                                 <p>Our team has implemented a robust catalog indexing system featuring Kafka, Storm, and Solr. This architecture ensures scalable, real-time catalog search and retrieval.</p>
                             </div>
-                            <div class="footer-social-icon">
+                            <div className="footer-social-icon">
                                 <span>Follow us</span>
                                 <a href="https://www.linkedin.com/in/ksssenapati/"><img src={`${process.env.PUBLIC_URL}/assets/avatar_1.png`} alt="logo"/></a>
                                 <a href="https://www.linkedin.com/in/arnab-paikaray/"><img src={`${process.env.PUBLIC_URL}/assets/avatar_2.png`} alt="logo"/></a>
@@ -54,9 +54,9 @@ const Footer = () => {
                             </div>
                         </div>
                     </div>
-                    <div class="col-xl-4 col-lg-4 col-md-6 mb-30">
-                        <div class="footer-widget">
-                            <div class="footer-widget-heading">
+                    <div className="col-xl-4 col-lg-4 col-md-6 mb-30">
+                        <div className="footer-widget">
+                            <div className="footer-widget-heading">
                                 <h3>Useful Links</h3>
                             </div>
                             <ul>
@@ -67,12 +67,12 @@ const Footer = () => {
                             </ul>
                         </div>
                     </div>
-                    <div class="col-xl-4 col-lg-4 col-md-6 mb-50">
-                        <div class="footer-widget">
-                            <div class="footer-widget-heading">
+                    <div className="col-xl-4 col-lg-4 col-md-6 mb-50">
+                        <div className="footer-widget">
+                            <div className="footer-widget-heading">
                                 <h3>Watch</h3>
                             </div>
-                            <div class="footer-text mb-25">
+                            <div className="footer-text mb-25">
                                 <p>Watch our demo in action</p>
                             </div>
                             <iframe src="https://drive.google.com/file/d/1qwmKf3vgrO4acBAxs7M9E7FtNOTqsr-w/preview" title="Demo" allow="autoplay"></iframe>

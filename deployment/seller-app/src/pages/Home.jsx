@@ -1,12 +1,12 @@
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate} from 'react-router-dom';
 import GlowCard from '../components/GlowCard';
 
 import ProductModal from '../components/ProductModal';
 import Header from '../components/Header';
-import '../style/home2.css'
+import '../style/home2.css';
 
 const Home = () => {
     const navigate = useNavigate();
