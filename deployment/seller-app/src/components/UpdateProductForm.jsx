@@ -1,8 +1,8 @@
 import Button from 'react-bootstrap/Button';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Form from 'react-bootstrap/Form';
 import { Col } from 'react-bootstrap';
-import { Row }from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 import { ImageUpload } from './ImageUpload';
 import { useEffect, useState } from 'react';
 import Table from "react-bootstrap/Table";
@@ -14,22 +14,8 @@ import ShowModal from './ShowModal';
 import '../config';
 import Loader from './Loader';
 
-// const response = {
-//     "product_id": "1323re2",
-//     "product_title": "Delight Shirt",
-//     "product_type": "Live",
-//     "master_category": "apparel",
-//     "sub_category": "topwear",
-//     "article_type": "tshirts",
-//     "attributes": {"fabric": "nylon", "neck": "collar", "fabric 2": "helllo"}, 
-//     "price": "100",
-//     "discount": "10",
-//     "discounted_price": "90",
-//     "accelerator_tag": ['hi', 'fwe'],
-//     "pincode": ['129001309', '219831983', '31u13u']
-// }
-
 const UpdateProductForm = () => {
+  const navigate = useNavigate();
   const location = useLocation();
   const [loader, setLoader] = useState(false);
 
@@ -77,8 +63,8 @@ const UpdateProductForm = () => {
   const getAttributes = () => {
     const _attribute = {};
     attribute.forEach((item, index) => {
-      if (attributeValue[index] !==  undefined) {
-        
+      if (attributeValue[index] !== undefined) {
+
         _attribute[item] = attributeValue[index];
       }
     })
@@ -101,29 +87,29 @@ const UpdateProductForm = () => {
       "discounted_price": discountedPrice,
       "accelerator_tag": acceleratorTag,
       "pincode": pinCode,
-      "main_image" : imageFile
+      "main_image": imageFile
     }
 
     const options = {
       method: 'post',
       headers: {
-        "access-control-allow-origin" : "*",
+        "access-control-allow-origin": "*",
         "Content-Type": "application/json"
       },
       body: JSON.stringify(_payload)
     }
 
-    fetch(global.config.url+"updateProduct", options)
-        .then((response) => {
-          setLoader(false);
-          return response.json();
-        })
-        .then(response => setSubmitStatus(true))
-        .catch(err => console.log(err)) 
+    fetch(global.config.url + "updateProduct", options)
+      .then((response) => {
+        setLoader(false);
+        return response.json();
+      })
+      .then(response => setSubmitStatus(true))
+      .catch(err => console.log(err))
   }
 
   const handleEmpty = (option) => {
-    switch(option){
+    switch (option) {
       case 0:
         setAttribute([]);
         setAttributeValue([]);
@@ -149,124 +135,124 @@ const UpdateProductForm = () => {
 
   return (
     <>
-    {loader && <Loader /> }
-    <Form onSubmit={(e) => handleSubmit(e)} className="pb-6">
-      {submitStatus && <ShowModal modalTitle="Update Successful" modalContent={`Your product id ${response['product_id']} has been updated.`} onClose={()=> setSubmitStatus(false)} modalShow={submitStatus} />}
+      {loader && <Loader />}
+      <Form onSubmit={(e) => handleSubmit(e)} className="pb-6">
+        {submitStatus && <ShowModal modalTitle="Update Successful" modalContent={`Your product id ${response['product_id']} has been updated.`} onClose={() => navigate('/')} modalShow={submitStatus} />}
         <Row>
-        <h3 className='mb-3'>Update Product Form</h3>
-        <Col md = {8}>
+          <h3 className='mb-3'>Update Product Form</h3>
+          <Col md={8}>
             <Row>
-                <Col md={8}>
+              <Col md={8}>
                 <Form.Group className="mb-3" controlId="formProductTitle">
-                    <Form.Label>Product Title</Form.Label>
-                    <Form.Control required type="text" value={productTitle} placeholder="Enter Title" onChange={e => setProductTitle(e.target.value)}/>
+                  <Form.Label>Product Title</Form.Label>
+                  <Form.Control required type="text" value={productTitle} placeholder="Enter Title" onChange={e => setProductTitle(e.target.value)} />
                 </Form.Group>
               </Col>
               <Col>
                 <Form.Group className="mb-3" controld="formMasterCategory" >
-                    <Form.Label>Set Product Type</Form.Label>
-                    <Form.Select required value={productType} onChange={(e) => setProductType(e.target.value)}>
-                      <option></option>
-                      <option>Live</option>
-                      <option>Non-Live</option>
-                    </Form.Select>
-                  </Form.Group>
+                  <Form.Label>Set Product Type</Form.Label>
+                  <Form.Select required value={productType} onChange={(e) => setProductType(e.target.value)}>
+                    <option></option>
+                    <option>Live</option>
+                    <option>Non-Live</option>
+                  </Form.Select>
+                </Form.Group>
               </Col>
             </Row>
 
             {/* Master Category Dropdown Start*/}
             <Row>
               <Col>
-                  <Form.Group className="mb-3" controld="formMasterCategory" >
-                    <Form.Label>Set Master Category</Form.Label>
-                    <Form.Select required value={masterCategory} disabled={productTitle===""} onChange={(e) => {
-                        setMasterCategory(e.target.value);
-                        e.target.value === "" ? handleEmpty(2) : setSubCategoryList(Object.keys(data[e.target.value]));
-                      }
-                    }>
-                      <option></option>
-                      {masterCategoryList?.map((item, index)=> {
-                        return(
-                          <>
+                <Form.Group className="mb-3" controld="formMasterCategory" >
+                  <Form.Label>Set Master Category</Form.Label>
+                  <Form.Select required value={masterCategory} disabled={productTitle === ""} onChange={(e) => {
+                    setMasterCategory(e.target.value);
+                    e.target.value === "" ? handleEmpty(2) : setSubCategoryList(Object.keys(data[e.target.value]));
+                  }
+                  }>
+                    <option></option>
+                    {masterCategoryList?.map((item, index) => {
+                      return (
+                        <>
                           <option key={index}>{item}</option>
-                          </>
-                        )
-                      })}
-                    </Form.Select>
-                  </Form.Group>
+                        </>
+                      )
+                    })}
+                  </Form.Select>
+                </Form.Group>
               </Col>
               {/* Master Category Dropdown End*/}
 
               {/* Sub category Dropdown Start*/}
               <Col>
-                  <Form.Group className="mb-3" controld="formSubCategory" >
-                    <Form.Label>Set Sub Category</Form.Label>
-                    <Form.Select required value={subCategory} disabled={subCategoryList.length===0} onChange={(e) => {
-                        setSubCategory(e.target.value);
-                        e.target.value === "" ? handleEmpty(1) : setArticleList(Object.keys(data[masterCategory][e.target.value]));
-                      }
-                    }>
-                      <option></option>
-                      {subCategoryList.length!== 0 && subCategoryList?.map((item, index)=> {
-                        return(
-                          <>
+                <Form.Group className="mb-3" controld="formSubCategory" >
+                  <Form.Label>Set Sub Category</Form.Label>
+                  <Form.Select required value={subCategory} disabled={subCategoryList.length === 0} onChange={(e) => {
+                    setSubCategory(e.target.value);
+                    e.target.value === "" ? handleEmpty(1) : setArticleList(Object.keys(data[masterCategory][e.target.value]));
+                  }
+                  }>
+                    <option></option>
+                    {subCategoryList.length !== 0 && subCategoryList?.map((item, index) => {
+                      return (
+                        <>
                           <option key={index}>{item}</option>
-                          </>
-                        )
-                      })}
-                    </Form.Select>
-                  </Form.Group>
+                        </>
+                      )
+                    })}
+                  </Form.Select>
+                </Form.Group>
               </Col>
               {/* Sub category Dropdown End*/}
 
               {/* Article Dropdown Start*/}
               <Col>
-                  <Form.Group className="mb-3" controld="formArticle" >
-                    <Form.Label>Set Article</Form.Label>
-                    <Form.Select required value={article} disabled={articleList.length===0} onChange={(e) => {
-                      setArticle(e.target.value);
-                      if (e.target.value !== "") {
-                        const list_ = data[masterCategory][subCategory][e.target.value]
-                        setAttribute(list_);
-                        setAttributeValue(new Array(list_.length))
-                      } else {
-                        handleEmpty(0)
-                      }
+                <Form.Group className="mb-3" controld="formArticle" >
+                  <Form.Label>Set Article</Form.Label>
+                  <Form.Select required value={article} disabled={articleList.length === 0} onChange={(e) => {
+                    setArticle(e.target.value);
+                    if (e.target.value !== "") {
+                      const list_ = data[masterCategory][subCategory][e.target.value]
+                      setAttribute(list_);
+                      setAttributeValue(new Array(list_.length))
+                    } else {
+                      handleEmpty(0)
                     }
-                    }>
-                      <option></option>
-                      {articleList.length!== 0 && articleList?.map((item, index)=> {
-                        return(
-                          <>
+                  }
+                  }>
+                    <option></option>
+                    {articleList.length !== 0 && articleList?.map((item, index) => {
+                      return (
+                        <>
                           <option key={index}>{item}</option>
-                          </>
-                        )
-                      })}
-                    </Form.Select>
-                  </Form.Group>
+                        </>
+                      )
+                    })}
+                  </Form.Select>
+                </Form.Group>
               </Col>
               {/* Article Dropdown End*/}
             </Row>
 
             {/* Attribute List Start */}
             <Row>
-              {attribute.length !== 0 && 
+              {attribute.length !== 0 &&
                 <Table bordered hover>
                   <thead>
-                    <tr style={{textAlign: "center"}}>
+                    <tr style={{ textAlign: "center" }}>
                       <th>Attributes</th>
                       <th>Value</th>
                     </tr>
                   </thead>
                   <tbody>
                     {attribute?.map((item, index) => {
-                      return(
+                      return (
                         <tr>
                           <td>
                             {item.charAt(0).toUpperCase() + item.slice(1)}
                           </td>
                           <td>
-                            <Form.Control type="text" key ={index} value={attributeValue[index]} onChange={(e) => handleAttributeChange(index, e.target.value)} />
+                            <Form.Control type="text" key={index} value={attributeValue[index]} onChange={(e) => handleAttributeChange(index, e.target.value)} />
                           </td>
                         </tr>
                       )
@@ -280,40 +266,40 @@ const UpdateProductForm = () => {
             <Row>
               <Col>
                 <Form.Group className="mb-3" controlId="formPrice">
-                    <Form.Label>Price</Form.Label>
-                    <Form.Control required value={price} type="number" min="0" placeholder="Enter Price" onChange={(e) => {
-                      const val_ = e.target.value;
-                      setPrice(val_);
-                      if (discount !== 0) setDiscountedPrice(((1-(0.01 * discount))* val_).toFixed(2));
-                      }
-                    }/>
+                  <Form.Label>Price</Form.Label>
+                  <Form.Control required value={price} type="number" min="0" placeholder="Enter Price" onChange={(e) => {
+                    const val_ = e.target.value;
+                    setPrice(val_);
+                    if (discount !== 0) setDiscountedPrice(((1 - (0.01 * discount)) * val_).toFixed(2));
+                  }
+                  } />
                 </Form.Group>
               </Col>
               <Col>
                 <Form.Group className="mb-3" controlId="formDiscount">
-                    <Form.Label>Discount (%) </Form.Label>
-                    <Form.Control type="number" value={discount} disabled={price==="0"} step="0.01" min="0" max="100" placeholder="Enter Discount(%)" onChange={(e) => {
-                      setDiscount(e.target.value);
-                      setDiscountedPrice(((1-(0.01 * e.target.value))* price).toFixed(2));
-                      }
-                    }/>
+                  <Form.Label>Discount (%) </Form.Label>
+                  <Form.Control type="number" value={discount} disabled={price === "0"} step="0.01" min="0" max="100" placeholder="Enter Discount(%)" onChange={(e) => {
+                    setDiscount(e.target.value);
+                    setDiscountedPrice(((1 - (0.01 * e.target.value)) * price).toFixed(2));
+                  }
+                  } />
                 </Form.Group>
               </Col>
               <Col>
                 <Form.Group className="mb-3" controlId="formDiscountedPrice">
-                    <Form.Label>Discounted Price (INR) </Form.Label>
-                    <Form.Control type="number" value={discountedPrice} disabled={price==="0"} step="0.01" min="0" placeholder="Enter Discounted Price (INR)" onChange={(e) => {
-                      setDiscountedPrice(e.target.value);
-                      setDiscount(((1 - e.target.value/price) * 100).toFixed(2));
-                      }
-                    }/>
+                  <Form.Label>Discounted Price (INR) </Form.Label>
+                  <Form.Control type="number" value={discountedPrice} disabled={price === "0"} step="0.01" min="0" placeholder="Enter Discounted Price (INR)" onChange={(e) => {
+                    setDiscountedPrice(e.target.value);
+                    setDiscount(((1 - e.target.value / price) * 100).toFixed(2));
+                  }
+                  } />
                 </Form.Group>
               </Col>
             </Row>
 
             <Row>
               <Col>
-              <Form.Group className="mb-3" controlId="formAcceleratorTag">
+                <Form.Group className="mb-3" controlId="formAcceleratorTag">
                   <Form.Label>Accelerator Tags</Form.Label>
                   <TagsInput
                     value={acceleratorTag}
@@ -321,10 +307,10 @@ const UpdateProductForm = () => {
                     name="Accelerator"
                     placeHolder="Enter Accelerator Tags"
                   />
-              </Form.Group>
+                </Form.Group>
               </Col>
               <Col>
-              <Form.Group className="mb-3" controlId="formPincode">
+                <Form.Group className="mb-3" controlId="formPincode">
                   <Form.Label>Pincode</Form.Label>
                   <TagsInput
                     value={pinCode}
@@ -332,21 +318,21 @@ const UpdateProductForm = () => {
                     name="pincode"
                     placeHolder="Enter Pincodes"
                   />
-              </Form.Group>
+                </Form.Group>
               </Col>
             </Row>
             <Row>
               <Button variant="outline-primary" type="submit" className="mt-3">
                 Submit
               </Button>
-            </Row>            
-        </Col>
-        <Col md = {4}>
+            </Row>
+          </Col>
+          <Col md={4}>
             <ImageUpload setImageFile={setImageFile} />
-        </Col>
+          </Col>
         </Row>
-    </Form>
-  </>
+      </Form>
+    </>
   );
 }
 
