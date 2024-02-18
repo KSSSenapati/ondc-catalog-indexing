@@ -1,12 +1,13 @@
 import Button from 'react-bootstrap/Button';
 import Form from 'react-bootstrap/Form';
 import { Col } from 'react-bootstrap';
-import { Row }from 'react-bootstrap';
+import { Row } from 'react-bootstrap';
 import { ImageUpload } from './ImageUpload';
 import { useState } from 'react';
 import Table from "react-bootstrap/Table";
 import { TagsInput } from 'react-tag-input-component';
 import Loader from './Loader.jsx';
+import { useNavigate } from 'react-router-dom';
 
 import data from '../data.json';
 import ShowModal from './ShowModal';
@@ -16,6 +17,7 @@ import '../config.js';
 var randomize = require('randomatic');
 
 function AddProductForm() {
+  const navigate = useNavigate();
   const [loader, setLoader] = useState(false)
 
   const [productId, setProductId] = useState("")
@@ -54,8 +56,8 @@ function AddProductForm() {
   const getAttributes = () => {
     const _attribute = {};
     attribute.forEach((item, index) => {
-      if (attributeValue[index] !==  undefined) {
-        
+      if (attributeValue[index] !== undefined) {
+
         _attribute[item] = attributeValue[index];
       }
     })
@@ -65,7 +67,7 @@ function AddProductForm() {
   const handleSubmit = (e) => {
     e.preventDefault();
     setLoader(true);
-    const _id = randomize('0', 8)
+    const _id = "1" + randomize('0', 7)
     setProductId(_id);
     const _payload = {
       "product_id": _id,
@@ -80,31 +82,33 @@ function AddProductForm() {
       "discounted_price": discountedPrice,
       "accelerator_tag": acceleratorTag,
       "pincode": pinCode,
-      "main_image" : imageFile
+      "main_image": imageFile
     }
     const options = {
       method: 'post',
       headers: {
-        "access-control-allow-origin" : "*",
+        "access-control-allow-origin": "*",
         "Content-Type": "application/json"
       },
       body: JSON.stringify(_payload)
     }
 
     console.log(options.body);
-    fetch(global.config.url+"addProduct", options)
+    fetch(global.config.url + "addProduct", options)
       .then((response) => {
         setLoader(false);
         return response.json();
       })
       .then((response) => {
-        if (response.status === 'success') setSubmitStatus(true);
+        if (response.status === 'success') {
+          setSubmitStatus(true);
+        }
       })
       .catch(err => console.log(err))
   }
 
   const handleHierarchy = (option, e) => {
-    switch(option){
+    switch (option) {
       case 0:
         setAttribute([]);
         setAttributeValue([]);
@@ -136,126 +140,127 @@ function AddProductForm() {
     }
   }
 
+
   return (
     <>
-    {loader && <Loader />}
-    <Form onSubmit={(e) => handleSubmit(e)} className="pb-6">
-      {submitStatus && <ShowModal modalContent={`Your Product id is ${productId}`} onClose={()=> setSubmitStatus(false)} modalShow={submitStatus} modalTitle="Successful Product Addition" />}
+      {loader && <Loader />}
+      <Form onSubmit={(e) => handleSubmit(e)} className="pb-6">
+        {submitStatus && <ShowModal modalContent={`Your Product id is ${productId}`} onClose={() => navigate('/')} modalShow={submitStatus} modalTitle="Successful Product Addition" />}
         <Row>
-        <h3 className='mb-3'>Add Product Form</h3>
-        <Col md = {8}>
+          <h3 className='mb-3'>Add Product Form</h3>
+          <Col md={8}>
             <Row>
               <Col md={8}>
                 <Form.Group className="mb-3" controlId="formProductTitle">
-                    <Form.Label>Product Title</Form.Label>
-                    <Form.Control required type="text" placeholder="Enter Title" onChange={e => setProductTitle(e.target.value)}/>
+                  <Form.Label>Product Title</Form.Label>
+                  <Form.Control required type="text" placeholder="Enter Title" onChange={e => setProductTitle(e.target.value)} />
                 </Form.Group>
               </Col>
               <Col>
                 <Form.Group className="mb-3" controld="formMasterCategory" >
-                    <Form.Label>Set Product Type</Form.Label>
-                    <Form.Select required onChange={(e) => setProductType(e.target.value)}>
-                      <option></option>
-                      <option>Live</option>
-                      <option>Non-Live</option>
-                    </Form.Select>
-                  </Form.Group>
+                  <Form.Label>Set Product Type</Form.Label>
+                  <Form.Select required onChange={(e) => setProductType(e.target.value)}>
+                    <option></option>
+                    <option>Live</option>
+                    <option>Non-Live</option>
+                  </Form.Select>
+                </Form.Group>
               </Col>
             </Row>
 
             {/* Master Category Dropdown Start*/}
             <Row>
               <Col>
-                  <Form.Group className="mb-3" controld="formMasterCategory" >
-                    <Form.Label>Set Master Category</Form.Label>
-                    <Form.Select required disabled={productTitle===""} onChange={(e) => {
-                        setMasterCategory(e.target.value);
-                        e.target.value === "" ? handleHierarchy(2, e) : handleHierarchy(3, e);
-                      }
-                    }>
-                      <option></option>
-                      {masterCategoryList?.map((item, index)=> {
-                        return(
-                          <>
+                <Form.Group className="mb-3" controld="formMasterCategory" >
+                  <Form.Label>Set Master Category</Form.Label>
+                  <Form.Select required disabled={productTitle === ""} onChange={(e) => {
+                    setMasterCategory(e.target.value);
+                    e.target.value === "" ? handleHierarchy(2, e) : handleHierarchy(3, e);
+                  }
+                  }>
+                    <option></option>
+                    {masterCategoryList?.map((item, index) => {
+                      return (
+                        <>
                           <option key={index}>{item}</option>
-                          </>
-                        )
-                      })}
-                    </Form.Select>
-                  </Form.Group>
+                        </>
+                      )
+                    })}
+                  </Form.Select>
+                </Form.Group>
               </Col>
               {/* Master Category Dropdown End*/}
 
               {/* Sub category Dropdown Start*/}
               <Col>
-                  <Form.Group className="mb-3" controld="formSubCategory" >
-                    <Form.Label>Set Sub Category</Form.Label>
-                    <Form.Select required disabled={subCategoryList.length===0} onChange={(e) => {
-                        setSubCategory(e.target.value);
-                        e.target.value === "" ? handleHierarchy(1, e) : setArticleList(Object.keys(data[masterCategory][e.target.value]));
-                      }
-                    }>
-                      <option></option>
-                      {subCategoryList.length!== 0 && subCategoryList?.map((item, index)=> {
-                        return(
-                          <>
+                <Form.Group className="mb-3" controld="formSubCategory" >
+                  <Form.Label>Set Sub Category</Form.Label>
+                  <Form.Select required disabled={subCategoryList.length === 0} onChange={(e) => {
+                    setSubCategory(e.target.value);
+                    e.target.value === "" ? handleHierarchy(1, e) : setArticleList(Object.keys(data[masterCategory][e.target.value]));
+                  }
+                  }>
+                    <option></option>
+                    {subCategoryList.length !== 0 && subCategoryList?.map((item, index) => {
+                      return (
+                        <>
                           <option key={index}>{item}</option>
-                          </>
-                        )
-                      })}
-                    </Form.Select>
-                  </Form.Group>
+                        </>
+                      )
+                    })}
+                  </Form.Select>
+                </Form.Group>
               </Col>
               {/* Sub category Dropdown End*/}
 
               {/* Article Dropdown Start*/}
               <Col>
-                  <Form.Group className="mb-3" controld="formArticle" >
-                    <Form.Label>Set Article</Form.Label>
-                    <Form.Select required disabled={articleList.length===0} onChange={(e) => {
-                      setArticle(e.target.value);
-                      if (e.target.value !== "") {
-                        const list_ = data[masterCategory][subCategory][e.target.value]
-                        setAttribute(list_);
-                        setAttributeValue(new Array(list_.length))
-                      } else {
-                        handleHierarchy(0, e)
-                      }
+                <Form.Group className="mb-3" controld="formArticle" >
+                  <Form.Label>Set Article</Form.Label>
+                  <Form.Select required disabled={articleList.length === 0} onChange={(e) => {
+                    setArticle(e.target.value);
+                    if (e.target.value !== "") {
+                      const list_ = data[masterCategory][subCategory][e.target.value]
+                      setAttribute(list_);
+                      setAttributeValue(new Array(list_.length))
+                    } else {
+                      handleHierarchy(0, e)
                     }
-                    }>
-                      <option></option>
-                      {articleList.length!== 0 && articleList?.map((item, index)=> {
-                        return(
-                          <>
+                  }
+                  }>
+                    <option></option>
+                    {articleList.length !== 0 && articleList?.map((item, index) => {
+                      return (
+                        <>
                           <option key={index}>{item}</option>
-                          </>
-                        )
-                      })}
-                    </Form.Select>
-                  </Form.Group>
+                        </>
+                      )
+                    })}
+                  </Form.Select>
+                </Form.Group>
               </Col>
               {/* Article Dropdown End*/}
             </Row>
 
             {/* Attribute List Start */}
             <Row>
-              {attribute.length !== 0 && 
+              {attribute.length !== 0 &&
                 <Table bordered hover>
                   <thead>
-                    <tr style={{textAlign: "center"}}>
+                    <tr style={{ textAlign: "center" }}>
                       <th>Attributes</th>
                       <th>Value</th>
                     </tr>
                   </thead>
                   <tbody>
                     {attribute?.map((item, index) => {
-                      return(
+                      return (
                         <tr>
                           <td>
                             {item.charAt(0).toUpperCase() + item.slice(1)}
                           </td>
                           <td>
-                            <Form.Control type="text" key ={index} value={attributeValue[index]} onChange={(e) => handleAttributeChange(index, e.target.value)} />
+                            <Form.Control type="text" key={index} value={attributeValue[index]} onChange={(e) => handleAttributeChange(index, e.target.value)} />
                           </td>
                         </tr>
                       )
@@ -269,40 +274,40 @@ function AddProductForm() {
             <Row>
               <Col>
                 <Form.Group className="mb-3" controlId="formPrice">
-                    <Form.Label>Price</Form.Label>
-                    <Form.Control required type="number" min="0" placeholder="Enter Price" onChange={(e) => {
-                      const val_ = e.target.value;
-                      setPrice(val_);
-                      if (discount !== 0) setDiscountedPrice(((1-(0.01 * discount))* val_).toFixed(2));
-                      }
-                    }/>
+                  <Form.Label>Price</Form.Label>
+                  <Form.Control required type="number" min="0" placeholder="Enter Price" onChange={(e) => {
+                    const val_ = e.target.value;
+                    setPrice(val_);
+                    if (discount !== 0) setDiscountedPrice(((1 - (0.01 * discount)) * val_).toFixed(2));
+                  }
+                  } />
                 </Form.Group>
               </Col>
               <Col>
                 <Form.Group className="mb-3" controlId="formDiscount">
-                    <Form.Label>Discount (%) </Form.Label>
-                    <Form.Control type="number" disabled={price==="0"} min="0" max="100" step="0.01" value={discount} placeholder="Enter Discount(%)" onChange={(e) => {
-                      setDiscount(e.target.value);
-                      setDiscountedPrice(((1-(0.01 * e.target.value))* price).toFixed(2));
-                      }
-                    }/>
+                  <Form.Label>Discount (%) </Form.Label>
+                  <Form.Control type="number" disabled={price === "0"} min="0" max="100" step="0.01" value={discount} placeholder="Enter Discount(%)" onChange={(e) => {
+                    setDiscount(e.target.value);
+                    setDiscountedPrice(((1 - (0.01 * e.target.value)) * price).toFixed(2));
+                  }
+                  } />
                 </Form.Group>
               </Col>
               <Col>
                 <Form.Group className="mb-3" controlId="formDiscountedPrice">
-                    <Form.Label>Discounted Price (INR) </Form.Label>
-                    <Form.Control type="number" disabled={price==="0"} min="0" step="0.01" value={discountedPrice} placeholder="Enter Discounted Price (INR)" onChange={(e) => {
-                      setDiscountedPrice(e.target.value);
-                      setDiscount(((1 - e.target.value/price) * 100).toFixed(2));
-                      }
-                    }/>
+                  <Form.Label>Discounted Price (INR) </Form.Label>
+                  <Form.Control type="number" disabled={price === "0"} min="0" step="0.01" value={discountedPrice} placeholder="Enter Discounted Price (INR)" onChange={(e) => {
+                    setDiscountedPrice(e.target.value);
+                    setDiscount(((1 - e.target.value / price) * 100).toFixed(2));
+                  }
+                  } />
                 </Form.Group>
               </Col>
             </Row>
 
             <Row>
               <Col>
-              <Form.Group className="mb-3" controlId="formAcceleratorTag">
+                <Form.Group className="mb-3" controlId="formAcceleratorTag">
                   <Form.Label>Accelerator Tags</Form.Label>
                   <TagsInput
                     value={acceleratorTag}
@@ -310,10 +315,10 @@ function AddProductForm() {
                     name="Accelerator"
                     placeHolder="Enter Accelerator Tags"
                   />
-              </Form.Group>
+                </Form.Group>
               </Col>
               <Col>
-              <Form.Group className="mb-3" controlId="formPincode">
+                <Form.Group className="mb-3" controlId="formPincode">
                   <Form.Label>Pincode</Form.Label>
                   <TagsInput
                     value={pinCode}
@@ -321,20 +326,20 @@ function AddProductForm() {
                     name="pincode"
                     placeHolder="Enter Pincodes"
                   />
-              </Form.Group>
+                </Form.Group>
               </Col>
             </Row>
             <Row>
               <Button variant="outline-primary" type="submit" className="mt-3">
                 Submit
               </Button>
-            </Row>            
-        </Col>
-        <Col md = {4}>
+            </Row>
+          </Col>
+          <Col md={4}>
             <ImageUpload setImageFile={setImageFile} />
-        </Col>
+          </Col>
         </Row>
-    </Form>
+      </Form>
     </>
   );
 }
